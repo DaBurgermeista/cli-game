@@ -3,7 +3,7 @@ import random
 
 def generate_room(width, height, num_spikes):
     # 1. Start with a solid block of walls
-    grid = [[" " for _ in range(width)] for _ in range(height)]
+    grid = [["#" for _ in range(width)] for _ in range(height)]
 
     # 2. Carve out open floor inside the outer border and collect open floor tiles
     floor_tiles = []
