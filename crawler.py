@@ -2,13 +2,13 @@ import curses
 import random
 
 # Constants
-WALL = "#"
-FLOOR = "."
+WALL = WALL
+FLOOR = FLOOR
 DOOR = "+"
-KEY = "K"
-EXIT = "E"
-SPIKE = "^"
-PLAYER = "@"
+KEY = KEY
+EXIT = EXIT
+SPIKE = SPIKE
+PLAYER = PLAYER
 
 MAP_WIDTH = 50
 MAP_HEIGHT = 22
@@ -20,13 +20,13 @@ MAX_ROOM_HEIGHT = 5
 
 def generate_room(width, height, num_spikes):
     # 1. Start with a solid block of walls
-    grid = [["#" for _ in range(width)] for _ in range(height)]
+    grid = [[WALL for _ in range(width)] for _ in range(height)]
 
     # 2. Carve out open floor inside the outer border and collect open floor tiles
     floor_tiles = []
     for y in range(1, height - 1):
         for x in range(1, width - 1):
-            grid[y][x] = "."
+            grid[y][x] = FLOOR
             floor_tiles.append((x, y))
 
     # Shuffle the list so popping from it gives guaranteed unique positions
@@ -36,20 +36,20 @@ def generate_room(width, height, num_spikes):
     start_x, start_y = floor_tiles.pop()
 
     key_x, key_y = floor_tiles.pop()
-    grid[key_y][key_x] = "K"
+    grid[key_y][key_x] = KEY
 
     exit_x, exit_y = floor_tiles.pop()
-    grid[exit_y][exit_x] = "E"
+    grid[exit_y][exit_x] = EXIT
 
     for _ in range(num_spikes):
         if floor_tiles:
             sx, sy = floor_tiles.pop()
-            grid[sy][sx] = "^"
+            grid[sy][sx] = SPIKE
 
     return grid, start_x, start_y
 
 def can_enter(tile, has_key):
-    return tile != "#" and (tile != "D" or has_key)
+    return tile != WALL and (tile != DOOR or has_key)
 
 def is_area_solid(grid, x1, y1, w, h):
     # Make sure the room itself stays inside the outer wall border
@@ -66,7 +66,7 @@ def is_area_solid(grid, x1, y1, w, h):
     # Do not check the surrounding border, because one side touches the hallway.
     for y in range(y1, y1 + h):
         for x in range(x1, x1 + w):
-            if grid[y][x] != "#":
+            if grid[y][x] != WALL:
                 return False
 
     return True
@@ -95,14 +95,14 @@ def add_doors_to_room(grid, rx, ry, rw, rh, max_doors=2):
         # Make sure the door isn't on the outer edge of the map
         # and make sure it is a solid wall
         if 1 <= dx < len(grid[0]) - 1 and 1 <= dy < len(grid) - 1:
-            if grid[dy][dx] == "#":
+            if grid[dy][dx] == WALL:
                 grid[dy][dx] = "+"
                 doors_placed += 1
     
 
 def expand_from_door(grid, door_x, door_y, dx, dy):
     # Turn '+' door just stepped on into an open floor
-    grid[door_y][door_x] = "."
+    grid[door_y][door_x] = FLOOR
     hall_length = random.randint(2, 4)
 
     # 1. Dig the hallway
@@ -113,7 +113,7 @@ def expand_from_door(grid, door_x, door_y, dx, dy):
         if next_hx < 2 or next_hx >= len(grid[0]) - 2 or next_hy < 2 or next_hy >= len(grid) - 2:
             return
         hx, hy = next_hx, next_hy
-        grid[hy][hx] = "."
+        grid[hy][hx] = FLOOR
 
     # 2. Pick a random size for the new room
     rw = random.randint(4, 6)
@@ -133,7 +133,7 @@ def expand_from_door(grid, door_x, door_y, dx, dy):
     if is_area_solid(grid, rx, ry, rw, rh):
         for y in range(ry, ry + rh):
             for x in range(rx, rx + rw):
-                grid[y][x] = "."
+                grid[y][x] = FLOOR
         # Add 1 or 2 new '+' doors
         add_doors_to_room(grid, rx, ry, rw, rh)
 
@@ -148,12 +148,12 @@ def main(stdscr):
     has_key = False
     message = f"Floor {floor}: Find the key and reach the exit!"
     
-    room  = [["#" for _ in range(50)] for _ in range(22)]
+    room  = [[WALL for _ in range(50)] for _ in range(22)]
     
     start_rx, start_ry, start_rw, start_rh = 22, 9, 6, 4
     for y in range(start_ry, start_ry + start_rh):
         for x in range(start_rx, start_rx + start_rw):
-            room[y][x] = "."
+            room[y][x] = FLOOR
 
     add_doors_to_room(room, start_rx, start_ry, start_rw, start_rh, max_doors=3)
 
@@ -169,7 +169,7 @@ def main(stdscr):
         for y, row in enumerate(room):
             for x, tile in enumerate(row):
                 if x == player_x and y == player_y:
-                    stdscr.addstr(y + 2, x, "@")
+                    stdscr.addstr(y + 2, x, PLAYER)
                 else:
                     stdscr.addstr(y + 2, x, tile)
 
@@ -205,22 +205,22 @@ def main(stdscr):
 
         current_tile = room[player_y][player_x]
         
-        if current_tile  == "K":
+        if current_tile  == KEY:
             message = "You found a key"
             has_key = True
-            room[player_y][player_x] = "."
-        if current_tile == "E":
+            room[player_y][player_x] = FLOOR
+        if current_tile == EXIT:
             message = "You escaped!"
             break
         if current_tile  == "+":
             message = "You open the door."
-            room[player_y][player_x] = "."
+            room[player_y][player_x] = FLOOR
         if health == 0:
             message = "You died."
             stdscr.getkey()
             break
-        if current_tile == "^":
-            room[player_y][player_x] = "."
+        if current_tile == SPIKE:
+            room[player_y][player_x] = FLOOR
             health = max(0, health - 3)
             message = "Ouch! You stepped on a spike!"
 
