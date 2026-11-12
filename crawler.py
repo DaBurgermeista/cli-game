@@ -43,7 +43,7 @@ def is_area_solid(grid, x1, y1, w, h):
     for y in range(y1 - 1, y1 + h + 1):
         for x in range(x1 - 1, x1 + w + 1):
             if grid[y][x] != "#":
-	            return False
+                return False
     return True
 
 def add_doors_to_room(grid, rx, ry, rw, rh, max_doors=2):
