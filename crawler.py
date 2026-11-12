@@ -1,6 +1,23 @@
 import curses
 import random
 
+# Constants
+WALL = "#"
+FLOOR = "."
+DOOR = "+"
+KEY = "K"
+EXIT = "E"
+SPIKE = "^"
+PLAYER = "@"
+
+MAP_WIDTH = 50
+MAP_HEIGHT = 22
+MIN_ROOM_WIDTH = 4
+MAX_ROOM_WIDTH = 6
+MIN_ROOM_HEIGHT = 3
+MAX_ROOM_HEIGHT = 5
+# ---
+
 def generate_room(width, height, num_spikes):
     # 1. Start with a solid block of walls
     grid = [["#" for _ in range(width)] for _ in range(height)]
