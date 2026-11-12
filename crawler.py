@@ -35,15 +35,23 @@ def can_enter(tile, has_key):
     return tile != "#" and (tile != "D" or has_key)
 
 def is_area_solid(grid, x1, y1, w, h):
-    # Stay inside the map borders
-    if x1 < 1 or y1 < 1 or x1 + w >= len(grid[0]) - 1 or y1 + h >= len(grid) - 1:
+    # Make sure the room itself stays inside the outer wall border
+    if x1 < 1 or y1 < 1:
         return False
 
-    # Check that every tile in this box is still '#'
-    for y in range(y1 - 1, y1 + h + 1):
-        for x in range(x1 - 1, x1 + w + 1):
+    if x1 + w > len(grid[0]) - 1:
+        return False
+
+    if y1 + h > len(grid) - 1:
+        return False
+
+    # Check only the proposed room tiles.
+    # Do not check the surrounding border, because one side touches the hallway.
+    for y in range(y1, y1 + h):
+        for x in range(x1, x1 + w):
             if grid[y][x] != "#":
                 return False
+
     return True
 
 def add_doors_to_room(grid, rx, ry, rw, rh, max_doors=2):
@@ -69,7 +77,7 @@ def add_doors_to_room(grid, rx, ry, rw, rh, max_doors=2):
 
         # Make sure the door isn't on the outer edge of the map
         # and make sure it is a solid wall
-        if 1 < dx < len(grid[0]) - 1 and 1 < dy < len(grid) - 2:
+        if 1 <= dx < len(grid[0]) - 1 and 1 <= dy < len(grid) - 1:
             if grid[dy][dx] == "#":
                 grid[dy][dx] = "+"
                 doors_placed += 1
