@@ -116,8 +116,8 @@ def expand_from_door(grid, door_x, door_y, dx, dy):
         grid[hy][hx] = FLOOR
 
     # 2. Pick a random size for the new room
-    rw = random.randint(4, 6)
-    rh = random.randint(3, 5)
+    rw = random.randint(MIN_ROOM_WIDTH, MAX_ROOM_WIDTH)
+    rh = random.randint(MIN_ROOM_HEIGHT, MAX_ROOM_HEIGHT)
 
     # Postion the room depending on direction walked
     if dx == 1:
@@ -148,7 +148,7 @@ def main(stdscr):
     has_key = False
     message = f"Floor {floor}: Find the key and reach the exit!"
     
-    room  = [[WALL for _ in range(50)] for _ in range(22)]
+    room  = [[WALL for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
     
     start_rx, start_ry, start_rw, start_rh = 22, 9, 6, 4
     for y in range(start_ry, start_ry + start_rh):
@@ -198,7 +198,7 @@ def main(stdscr):
             dy = next_y - player_y
             player_x, player_y = next_x, next_y
             
-            if room[player_y][player_x] == "+":
+            if room[player_y][player_x] == DOOR:
                 expand_from_door(room, player_x, player_y, dx, dy)
                 message = "You opened a door into the unknown!"
             
@@ -212,7 +212,7 @@ def main(stdscr):
         if current_tile == EXIT:
             message = "You escaped!"
             break
-        if current_tile  == "+":
+        if current_tile  == DOOR:
             message = "You open the door."
             room[player_y][player_x] = FLOOR
         if health == 0:
