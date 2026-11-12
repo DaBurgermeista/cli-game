@@ -2,13 +2,13 @@ import curses
 import random
 
 # Constants
-WALL = WALL
-FLOOR = FLOOR
+WALL = "#"
+FLOOR = "."
 DOOR = "+"
-KEY = KEY
-EXIT = EXIT
-SPIKE = SPIKE
-PLAYER = PLAYER
+KEY = "K"
+EXIT = "E"
+SPIKE = "^"
+PLAYER ="@"
 
 MAP_WIDTH = 50
 MAP_HEIGHT = 22
