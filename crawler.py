@@ -49,7 +49,7 @@ def generate_room(width, height, num_spikes):
     return grid, start_x, start_y
 
 def can_enter(tile, has_key):
-    return tile != WALL and (tile != DOOR or has_key)
+    return tile != WALL
 
 def is_area_solid(grid, x1, y1, w, h):
     # Make sure the room itself stays inside the outer wall border
