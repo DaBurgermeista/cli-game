@@ -12,6 +12,7 @@ PLAYER ="player"
 TREE = "tree"
 ROCK = "rock"
 WATER = "water"
+BRIDGE = "bridge"
 
 TILE_DATA = {
     FLOOR: {"char": ".", "name": "Floor", "color": 1, "walkable": True},
@@ -23,6 +24,7 @@ TILE_DATA = {
     DOOR: {"char": "+", "name": "Door", "color": 3, "walkable": False, "needs_key": True},
     KEY: {"char": "K", "name": "Key", "color": 3, "walkable": True, "pickup": "key"},
     EXIT: {"char": "E", "name": "Exit", "color": 3, "walkable": True, "exit": True},
+    BRIDGE: {"char": "=", "name": "Bridge", "color": 3, "walkable": True},
 }
 
 MAP_WIDTH = 50
@@ -107,6 +109,40 @@ def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04):
         fx += dx
         fy += dy
 
+def carve_river(grid):
+    height = len(grid)
+    width = len(grid[0])
+
+    # Start somewhere near the middle-ish of the top border
+    rx = random.randint(width // 4, (width * 3) // 4)
+    bridge_y = height // 2
+
+    # Go from top border (y=1) to bottom border (height - 2)
+    for ry in range(1, height - 1):
+    # Build a walkable bridge halfway across
+    if ry == bridge_y or ry == bridge_y + 1:
+        grid[ry][rx] = BRIDGE
+        if rx + 1 < width - 1:
+            grid[ry][rx + 1] = BRIDGE
+    else:
+        grid[ry][rx] = WATER
+        if rx + 1 < width - 1:
+            grid[ry][rx + 1] = WATER
+
+def stamp_forest_near_water(grid, scale=0.05):
+    water_tiles = []
+
+    # Find every water tile on the map
+    for y, row in enumerate(grid):
+        for x, tile in enumerate(row):
+            if tile == WATER:
+                water_tiles.append((x, y))
+
+    # Pick a random water tile and start a tree blob
+    if water_tiles:
+        wx, wy = random.choice(water_tiles)
+        stamp_blob(grid, wx, wy, TREE, scale=scale)
+
 def main(stdscr):
     # Hide the blinking terminal cursor
     curses.curs_set(0)  
@@ -120,17 +156,19 @@ def main(stdscr):
 
     total_tiles = map_width * map_height
 
-    # Stamp in forests
-    for _ in range(4):
-        forest_x = random.randint(5, map_width - 6)
-        forest_y = random.randint(4, map_height - 5)
-        stamp_blob(room, forest_x, forest_y, TREE, scale=0.05)
+    # Generate Water Features first
+    ## Generate River
+    carve_river(room)
 
-    # Stamp Lakes
+    ## Stamp Lakes
     for _ in range(3):
         lake_x = random.randint(5, map_width - 6)
         lake_y = random.randint(4, map_height - 5)
         stamp_blob(room, lake_x, lake_y, WATER, scale=0.04)
+
+    # Put forests in by water
+    for _ in range(4):
+        stamp_forest_near_water(room, scale=0.05)
 
     scatter_tiles(room, TREE, 4)
     
