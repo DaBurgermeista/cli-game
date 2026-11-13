@@ -208,7 +208,7 @@ def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
                         else:
                             grid[y][x] = WALL
                     else:
-                        grid[y][x] = WALL
+                        grid[y][x] = FLOOR
 
             # Punch a doorway
             side = random.choice(["top", "bottom", "left", "right"])
