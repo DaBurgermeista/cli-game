@@ -94,7 +94,7 @@ def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04):
 
     fx, fy = center_x, center_y
 
-    for _ in range(size):
+    for _ in range(steps):
         if 2 < fx < width - 3 and 2 < fy < height - 3:
             if grid[fy][fx] == FLOOR:
                 grid[fy][fx] = tile_type
