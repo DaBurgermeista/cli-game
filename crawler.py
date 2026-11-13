@@ -136,7 +136,7 @@ def main(stdscr):
     for _ in range(4):
         lake_x = random.randint(5, map_width - 6)
         lake_y = random.randint(4, map_height - 5)
-        stamp_forest(room, lake_x, lake_y, size=30)
+        stamp_lake(room, lake_x, lake_y, size=30)
 
     scatter_tiles(room, TREE, 4)
     scatter_tiles(room, ROCK, 10)
