@@ -90,7 +90,7 @@ def stamp_forest(grid, center_x, center_y, size=25):
     for _ in range(size):
         if 2 < fx < width - 3 and 2 < fy < height - 3:
             if grid[fy][fx] == ".":
-                grid[fy][fx] == "T"
+                grid[fy][fx] = "T"
         
         dx, dy = random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
         fx += dx
