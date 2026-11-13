@@ -181,7 +181,7 @@ def stamp_forest_near_water(grid, scale=0.05):
 
 def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
     height = len(grid)
-    width = len(grid)
+    width = len(grid[0])
 
     # Try 50 times to find a dry, open spot on map
     for _ in range(50):
