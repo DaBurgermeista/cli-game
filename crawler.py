@@ -14,15 +14,15 @@ ROCK = "rock"
 WATER = "water"
 
 TILE_DATA = {
-    FLOOR: {"char": ".", "color": 1, "walkable": True},
-    WALL: {"char": "#", "color": 1, "walkable": False},
-    TREE: {"char": "T", "color": 2, "walkable": False},
-    ROCK: {"char": "O", "color": 3, "walkable": False},
-    WATER: {"char": "~", "color": 6, "walkable": False},
-    SPIKE: {"char": "^", "color": 4, "walkable": True, "damage": 1},
-    DOOR: {"char": "+", "color": 3, "walkable": False, "needs_key": True},
-    KEY: {"char": "K", "color": 3, "walkable": True, "pickup": "key"},
-    EXIT: {"char": "E", "color": 3, "walkable": True, "exit": True},
+    FLOOR: {"char": ".", "name": "Floor", "color": 1, "walkable": True},
+    WALL: {"char": "#", "name": "Wall", "color": 1, "walkable": False},
+    TREE: {"char": "T", "name": "Tree", "color": 2, "walkable": False},
+    ROCK: {"char": "O", "name": "Rock", "color": 3, "walkable": False},
+    WATER: {"char": "~", "name": "Water", "color": 6, "walkable": False},
+    SPIKE: {"char": "^", "name": "Spike", "color": 4, "walkable": True, "damage": 1},
+    DOOR: {"char": "+", "name": "Door", "color": 3, "walkable": False, "needs_key": True},
+    KEY: {"char": "K", "name": "Key", "color": 3, "walkable": True, "pickup": "key"},
+    EXIT: {"char": "E", "name": "Exit", "color": 3, "walkable": True, "exit": True},
 }
 
 MAP_WIDTH = 50
