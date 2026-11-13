@@ -13,6 +13,7 @@ TREE = "tree"
 ROCK = "rock"
 WATER = "water"
 BRIDGE = "bridge"
+BANK = "bank"
 
 TILE_DATA = {
     FLOOR: {"char": ".", "name": "Floor", "color": 1, "walkable": True},
@@ -25,6 +26,7 @@ TILE_DATA = {
     KEY: {"char": "K", "name": "Key", "color": 3, "walkable": True, "pickup": "key"},
     EXIT: {"char": "E", "name": "Exit", "color": 3, "walkable": True, "exit": True},
     BRIDGE: {"char": "=", "name": "Bridge", "color": 3, "walkable": True},
+    BANK: {"char": ",", "name": "Riverbank", "color": 3, "walkable": True},
 }
 
 MAP_WIDTH = 50
@@ -102,7 +104,7 @@ def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04):
 
     for _ in range(steps):
         if 2 < fx < width - 3 and 2 < fy < height - 3:
-            if grid[fy][fx] == FLOOR:
+            if grid[fy][fx] in (FLOOR, BANK):
                 grid[fy][fx] = tile_type
         
         dx, dy = random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
@@ -117,8 +119,40 @@ def carve_river(grid):
     rx = random.randint(width // 4, (width * 3) // 4)
     bridge_y = height // 2
 
+    drift = random.choice([-1, 1])
+    bend_timer = random.randint(4, 8)
+    river_width = 2
+
     # Go from top border (y=1) to bottom border (height - 2)
     for ry in range(1, height - 1):
+        left_bank = rx - 1
+        right_bank =  rx + river_width
+        if 1 < left_bank < width - 2 and grid[ry][left_bank] == FLOOR:
+            grid[ry][left_bank] = BANK
+        if 1 < right_bank < width - 2 and grid[ry][right_bank] == FLOOR:
+            grid[ry][right_bank] = BANK
+
+        for offset in range(river_width):
+            curr_x = rx + offset
+            if 1 < curr_x < width - 2:
+                if ry == bridge_y or ry == bridge_y + 1:
+                    grid[ry][curr_x] = BRIDGE
+                else:
+                    grid[ry][curr_x] = WATER
+
+        # Handle momentum so the river makes wide, natural S-curves
+        bend_timer -= 1
+        if bend_timer <= 0:
+            drift = random.choice([-1, 0, 1])
+            bend_timer = random.randint(4, 8)
+
+        # Occasionally widen or narrow the channel
+        if random.random() < 0.25:
+            river_width = max(2, min(4, river_width + random.choice([-1, 1])))
+
+        # Move horizontally by 1 or 2 in current drift direction
+        step = drift * random.choice([1, 1, 2])
+        rx = max(3, min(width - river_width - 3, rx + step))
         # Build a walkable bridge halfway across
         if ry == bridge_y or ry == bridge_y + 1:
             grid[ry][rx] = BRIDGE
