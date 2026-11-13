@@ -266,13 +266,6 @@ def main(stdscr):
 
     stamp_building(room, w=6, h=5, is_ruin=True)
     stamp_building(room, w=8, h=5, is_ruin=True)
-    
-    """ --- Was for testing purposes
-    scatter_tiles(room, ROCK, total_tiles // 150)
-    scatter_tiles(room, SPIKE, total_tiles // 250)
-    """
-    scatter_tiles(room, KEY, 1)
-    scatter_tiles(room, EXIT, 1)
 
     player_x = map_width // 2
     player_y = map_height // 2
