@@ -92,7 +92,7 @@ def stamp_forest(grid, center_x, center_y, size=25):
             if grid[fy][fx] == FLOOR:
                 grid[fy][fx] == TREE
         
-        dx, dy - random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
+        dx, dy = random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
         fx += dx
         fy += dy
 
