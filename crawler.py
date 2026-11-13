@@ -68,8 +68,15 @@ def main(stdscr):
             next_x += 1
 
         # 3. Movement System checks TILE_DATA
-        if can_enter(room[next_y][next_x], has_key):
-            player_x, player_y = next_x, next_y
+        if (next_x, next_y) != (player_x, player_y):
+            target_tile = room[next_y][next_x]
+            target_props = TILE_DATA[target_tile]
+
+            if can_enter(target_tile, has_key):
+                player_x, player_y = next_x, next_y
+                message = target_props.get("enter_msg", "")
+            else:
+                message = target_props.get("bump_msg", "Something blocks your way.")
 
         # 4. Interaction System reads flags from TILE_DATA
         current_tile = room[player_y][player_x]
