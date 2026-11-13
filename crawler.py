@@ -3,7 +3,7 @@ import random
 
 # Constants
 WALL = "#"
-FLOOR = "."
+FLOOR = " "
 DOOR = "+"
 KEY = "K"
 EXIT = "E"
