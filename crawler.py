@@ -85,9 +85,12 @@ def scatter_tiles(grid, symbol, count):
             grid[ry][rx] = symbol
             placed += 1
 
-def stamp_blob(grid, center_x, center_y, tile_type, size=25):
+def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04):
     height = len(grid)
     width = len(grid[0])
+
+    # Calculate steps based on total map area
+    steps = int((width * height) * scale)
 
     fx, fy = center_x, center_y
 
@@ -111,21 +114,23 @@ def main(stdscr):
 
     room = create_overworld(map_width, map_height)
 
+    total_tiles = map_width * map_height
+
     # Stamp in forests
     for _ in range(4):
         forest_x = random.randint(5, map_width - 6)
         forest_y = random.randint(4, map_height - 5)
-        stamp_blob(room, forest_x, forest_y, TREE, size=30)
+        stamp_blob(room, forest_x, forest_y, TREE, scale=0.05)
 
     # Stamp Lakes
-    for _ in range(4):
+    for _ in range(3):
         lake_x = random.randint(5, map_width - 6)
         lake_y = random.randint(4, map_height - 5)
-        stamp_blob(room, lake_x, lake_y, WATER, size=30)
+        stamp_blob(room, lake_x, lake_y, WATER, scale=0.04)
 
     scatter_tiles(room, TREE, 4)
-    scatter_tiles(room, ROCK, 10)
-    scatter_tiles(room, SPIKE, 5)
+    scatter_tiles(room, ROCK, total_tiles // 150)
+    scatter_tiles(room, SPIKE, total_tiles // 250)
     scatter_tiles(room, KEY, 1)
     scatter_tiles(room, EXIT, 1)
 
