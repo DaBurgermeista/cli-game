@@ -6,7 +6,7 @@ from worldgen import (
     stamp_blob,
     stamp_forest_near_water,
     stamp_building,
-    generate_overworld,
+    generate_overworld
 )
 from render import init_colors, draw_map
 
@@ -33,11 +33,7 @@ def main(stdscr):
     map_height = max_y - 4
     map_width = max_x - 1  
 
-    room, player_x, player_y = create_overworld(map_width, map_height)
-
-    total_tiles = map_width * map_height
-
-    generate_overworld(map_width, map_height)
+    room, player_x, player_y = generate_overworld(map_width, map_height)
 
     health = 3
     has_key = False
