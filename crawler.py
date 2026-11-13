@@ -2,27 +2,27 @@ import curses
 import random
 
 # Constants
-WALL = "#"
-FLOOR = "."
-DOOR = "+"
-KEY = "K"
-EXIT = "E"
-SPIKE = "^"
-PLAYER ="@"
-TREE = "T"
-ROCK = "O"
-WATER = "~"
+WALL = "wall"
+FLOOR = "floor"
+DOOR = "door"
+KEY = "key"
+EXIT = "exit"
+SPIKE = "spike"
+PLAYER ="player"
+TREE = "tree"
+ROCK = "rock"
+WATER = "water"
 
 TILE_DATA = {
-    FLOOR: {"name": "Floor", "color": 1, "walkable": True},
-    WALL: {"name": "Wall", "color": 1, "walkable": False},
-    TREE: {"name": "Tree", "color": 2, "walkable": False},
-    ROCK: {"name": "Rock", "color": 3, "walkable": False},
-    WATER: {"name": "Water", "color": 6, "walkable": False},
-    SPIKE: {"name": "Spikes", "color": 4, "walkable": True, "damage": 1},
-    DOOR: {"name": "Door", "color": 3, "walkable": False, "needs_key": True},
-    KEY: {"name": "Key", "color": 3, "walkable": True, "pickup": "key"},
-    EXIT: {"name": "Exit", "color": 3, "walkable": True, "exit": True},
+    FLOOR: {"char": ".", "color": 1, "walkable": True},
+    WALL: {"char": "#", "color": 1, "walkable": False},
+    TREE: {"char": "T", "color": 2, "walkable": False},
+    ROCK: {"char": "O", "color": 3, "walkable": False},
+    WATER: {"char": "~", "color": 6, "walkable": False},
+    SPIKE: {"char": "^", "color": 4, "walkable": True, "damage": 1},
+    DOOR: {"char": "+", "color": 3, "walkable": False, "needs_key": True},
+    KEY: {"char": "K", "color": 3, "walkable": True, "pickup": "key"},
+    EXIT: {"char": "E", "color": 3, "walkable": True, "exit": True},
 }
 
 MAP_WIDTH = 50
@@ -51,15 +51,16 @@ def can_enter(tile_char, has_key):
 
 def draw_map(stdscr, grid, player_x, player_y):
     for y, row in enumerate(grid):
-        for x, tile_char in enumerate(row):
+        for x, tile_id in enumerate(row):
             if x == player_x and y == player_y:
                 stdscr.addstr(y + 2, x, "@", curses.color_pair(5))
             else:
+                props = TILE_DATE[tile_id]
                 color_id = TILE_DATA[tile_char]["color"]
                 attr = curses.color_pair(color_id)
                 if tile_char == FLOOR:
                     attr |= curses.A_DIM
-                stdscr.addstr(y + 2, x, tile_char, attr)
+                stdscr.addstr(y + 2, x, props["char"], attr)
   
 
 def create_overworld(width, height):
