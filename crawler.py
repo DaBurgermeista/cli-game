@@ -231,6 +231,7 @@ def main(stdscr):
         draw_map(stdscr, room, player_x, player_y)
 
         stdscr.addstr(len(room) + 3, 0, message)
+        stdscr.clrtoeol()
         stdscr.refresh()
 
         key = stdscr.getch()
