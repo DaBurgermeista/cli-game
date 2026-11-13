@@ -91,6 +91,10 @@ def stamp_forest(grid, center_x, center_y, size=25):
         if 2 < fx < width - 3 and 2 < fy < height - 3:
             if grid[fy][fx] == FLOOR:
                 grid[fy][fx] == TREE
+        
+        dx, dy - random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
+        fx += dx
+        fy += dy
 
 def main(stdscr):
     # Hide the blinking terminal cursor
