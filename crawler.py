@@ -41,9 +41,9 @@ def main(stdscr):
     message = "Explore the map!"   
 
     entities = [
-        create_entity("wolf", player_x + 4, player_y)
-        create_entity("deer", player_x - 4, player_y - 2)
-        create_entity("troll", player_x + 6, player_y + 3)
+        create_entity("wolf", player_x + 4, player_y),
+        create_entity("deer", player_x - 4, player_y - 2),
+        create_entity("troll", player_x + 6, player_y + 3),
     ]
 
     while True:
