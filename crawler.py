@@ -77,7 +77,7 @@ def scatter_tiles(grid, symbol, count):
         ry = random.randint(2, height - 3)
 
         if grid[ry][rx] == ".":
-            grid[ry][rx] == symbol
+            grid[ry][rx] = symbol
             placed += 1
 
 def main(stdscr):
