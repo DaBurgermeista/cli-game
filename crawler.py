@@ -18,7 +18,7 @@ BANK = "bank"
 TILE_DATA = {
     FLOOR: {"char": ".", "name": "Floor", "color": 1, "walkable": True},
     WALL: {"char": "#", "name": "Wall", "color": 1, "walkable": False},
-    TREE: {"char": "T", "name": "Tree", "color": 2, "walkable": False},
+    TREE: {"char": "T", "name": "Tree", "color": 2, "walkable": True},
     ROCK: {"char": "O", "name": "Rock", "color": 3, "walkable": False},
     WATER: {"char": "~", "name": "Water", "color": 6, "walkable": False},
     SPIKE: {"char": "^", "name": "Spike", "color": 4, "walkable": True, "damage": 1},
