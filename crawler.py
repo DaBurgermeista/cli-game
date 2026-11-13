@@ -190,9 +190,9 @@ def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
 
         # Check footprint
         spot_clear = True
-        for y in range(y1 - 1, y1 + h + 1):
-            for x in range(x1 - 1, x1 - w + 1):
-                if grid[y][x] in (WATER, BRIDGE, WALL, DOOR, KEY, EXIT):
+        for y in range(y1 - 2, y1 + h + 2):
+            for x in range(x1 - 2, x1 - w + 2):
+                if grid[y][x] in (WATER, BRIDGE, WALL, DOOR, KEY, EXIT, TREE):
                     spot_clear = False
                     break
             if not spot_clear:
