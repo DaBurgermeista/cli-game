@@ -119,15 +119,15 @@ def carve_river(grid):
 
     # Go from top border (y=1) to bottom border (height - 2)
     for ry in range(1, height - 1):
-    # Build a walkable bridge halfway across
-    if ry == bridge_y or ry == bridge_y + 1:
-        grid[ry][rx] = BRIDGE
-        if rx + 1 < width - 1:
-            grid[ry][rx + 1] = BRIDGE
-    else:
-        grid[ry][rx] = WATER
-        if rx + 1 < width - 1:
-            grid[ry][rx + 1] = WATER
+        # Build a walkable bridge halfway across
+        if ry == bridge_y or ry == bridge_y + 1:
+            grid[ry][rx] = BRIDGE
+            if rx + 1 < width - 1:
+                grid[ry][rx + 1] = BRIDGE
+        else:
+            grid[ry][rx] = WATER
+            if rx + 1 < width - 1:
+                grid[ry][rx + 1] = WATER
 
 def stamp_forest_near_water(grid, scale=0.05):
     water_tiles = []
