@@ -9,6 +9,7 @@ KEY = "K"
 EXIT = "E"
 SPIKE = "^"
 PLAYER ="@"
+TREE = "T"
 
 TILE_DATA = {
     ".": {"name": "Floor", "color": 1, "walkable": True},
@@ -80,6 +81,17 @@ def scatter_tiles(grid, symbol, count):
             grid[ry][rx] = symbol
             placed += 1
 
+def stamp_forest(grid, center_x, center_y, size=25):
+    height = len(grid)
+    width = len(grid[0])
+
+    fx, fy = center_x, center_y
+
+    for _ in range(size):
+        if 2 < fx < width - 3 and 2 < fy < height - 3:
+            if grid[fy][fx] == FLOOR:
+                grid[fy][fx] == TREE
+
 def main(stdscr):
     # Hide the blinking terminal cursor
     curses.curs_set(0)  
@@ -89,8 +101,14 @@ def main(stdscr):
     map_height = max_y - 4
     map_width = max_x - 1  
 
+    # Stamp in forests
+    for _ in range(4):
+        forest_x = random.randint(5, map_width - 6)
+        forest_y = random.randint(4, map_height - 5)
+        stamp_forest(room, forest_x. forest_y, size=30)
+
     room = create_overworld(map_width, map_height)
-    scatter_tiles(room, "T", 25)
+    scatter_tiles(room, "T", 4)
     scatter_tiles(room, "O", 10)
     scatter_tiles(room, "^", 5)
     scatter_tiles(room, "K", 1)
