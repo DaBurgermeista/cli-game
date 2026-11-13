@@ -60,15 +60,15 @@ def draw_map(stdscr, grid, player_x, player_y):
   
 
 def create_overworld(width, height):
-    grid = [["." for _ in range(width)] for _ in range(height)]
+    grid = [[FLOOR for _ in range(width)] for _ in range(height)]
 
     for x in range(width):
-        grid[0][x] = "#"
-        grid[height - 1][x] = "#"
+        grid[0][x] = WALL
+        grid[height - 1][x] = WALL
 
     for y in range(height):
-        grid[y][0] = "#"
-        grid[y][width - 1] = "#"
+        grid[y][0] = WALL
+        grid[y][width - 1] = WALL
 
     return grid
 
@@ -81,7 +81,7 @@ def scatter_tiles(grid, symbol, count):
         rx = random.randint(2, width - 3)
         ry = random.randint(2, height - 3)
 
-        if grid[ry][rx] == ".":
+        if grid[ry][rx] == FLOOR:
             grid[ry][rx] = symbol
             placed += 1
 
