@@ -78,8 +78,12 @@ def main(stdscr):
         if (next_x, next_y) != (player_x, player_y):
             target_tile = room[next_y][next_x]
             target_props = TILE_DATA[target_tile]
+            target_entity = get_entity_at(entities, next_x, next_y)
+            
+            if target_entity != None:
+                message = f"A {target_entity["name"]} blocks your path!"
 
-            if can_enter(target_tile, has_key):
+            elif can_enter(target_tile, has_key):
                 player_x, player_y = next_x, next_y
                 message = target_props.get("enter_msg", "")
             else:
