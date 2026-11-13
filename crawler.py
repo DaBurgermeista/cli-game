@@ -153,7 +153,8 @@ def carve_river(grid):
         # Move horizontally by 1 or 2 in current drift direction
         step = drift * random.choice([1, 1, 2])
         rx = max(3, min(width - river_width - 3, rx + step))
-        # Build a walkable bridge halfway across
+
+        """ Build a walkable bridge halfway across
         if ry == bridge_y or ry == bridge_y + 1:
             grid[ry][rx] = BRIDGE
             if rx + 1 < width - 1:
@@ -162,6 +163,7 @@ def carve_river(grid):
             grid[ry][rx] = WATER
             if rx + 1 < width - 1:
                 grid[ry][rx + 1] = WATER
+        """
 
 def stamp_forest_near_water(grid, scale=0.05):
     water_tiles = []
