@@ -106,16 +106,10 @@ def main(stdscr):
 
     while True:
         stdscr.clear()
-        
         stdscr.addstr(0,0,f"Health: {health} | Key: {'Yes' if has_key else 'No'}")
         
-        # Build room on screen from raw_room        
-        for y, row in enumerate(room):
-            for x, tile in enumerate(row):
-                if x == player_x and y == player_y:
-                    stdscr.addstr(y + 2, x, PLAYER)
-                else:
-                    stdscr.addstr(y + 2, x, tile)
+        # 1. Render System draws the whole grid with colors
+        draw_map(stdscr, room, player_x, player_y)
 
         stdscr.addstr(len(room) + 3, 0, message)
         stdscr.refresh()
