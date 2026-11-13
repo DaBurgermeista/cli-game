@@ -10,16 +10,19 @@ EXIT = "E"
 SPIKE = "^"
 PLAYER ="@"
 TREE = "T"
+ROCK = "O"
+WATER = "~"
 
 TILE_DATA = {
-    ".": {"name": "Floor", "color": 1, "walkable": True},
-    "#": {"name": "Wall", "color": 1, "walkable": False},
-    "T": {"name": "Tree", "color": 2, "walkable": False},
-    "O": {"name": "Rock", "color": 3, "walkable": False},
-    "^": {"name": "Spikes", "color": 4, "walkable": True, "damage": 1},
+    FLOOR: {"name": "Floor", "color": 1, "walkable": True},
+    WALL: {"name": "Wall", "color": 1, "walkable": False},
+    TREE: {"name": "Tree", "color": 2, "walkable": False},
+    ROCK: {"name": "Rock", "color": 3, "walkable": False},
+    WATER: {"name": "Water", "color": 6, "walkable": False},
+    SPIKE: {"name": "Spikes", "color": 4, "walkable": True, "damage": 1},
     "D": {"name": "Door", "color": 3, "walkable": False, "needs_key": True},
-    "K": {"name": "Key", "color": 3, "walkable": True, "pickup": "key"},
-    "E": {"name": "Exit", "color": 3, "walkable": True, "exit": True},
+    KEY: {"name": "Key", "color": 3, "walkable": True, "pickup": "key"},
+    EXIT: {"name": "Exit", "color": 3, "walkable": True, "exit": True},
 }
 
 MAP_WIDTH = 50
@@ -38,6 +41,7 @@ def init_colors():
     curses.init_pair(3, curses.COLOR_YELLOW, -1)
     curses.init_pair(4, curses.COLOR_RED, -1)
     curses.init_pair(5, curses.COLOR_CYAN, -1)
+    curses.init_pair(6, curses.COLOR_BLUE, -1)
 
 def can_enter(tile_char, has_key):
     props = TILE_DATA[tile_char]
@@ -96,6 +100,21 @@ def stamp_forest(grid, center_x, center_y, size=25):
         fx += dx
         fy += dy
 
+def stamp_lake(grid, center_x, center_y, size=25):
+    height = len(grid)
+    width = len(grid[0])
+
+    fx, fy = center_x, center_y
+
+    for _ in range(size):
+        if 2 < fx < width - 3 and 2 < fy < height - 3:
+            if grid[fy][fx] == FLOOR:
+                grid[fy][fx] = WATER
+        
+        dx, dy = random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
+        fx += dx
+        fy += dy
+
 def main(stdscr):
     # Hide the blinking terminal cursor
     curses.curs_set(0)  
@@ -113,15 +132,21 @@ def main(stdscr):
         forest_y = random.randint(4, map_height - 5)
         stamp_forest(room, forest_x, forest_y, size=30)
 
+    # Stamp Lakes
+    for _ in range(4):
+        lake_x = random.randint(5, map_width - 6)
+        lake_y = random.randint(4, map_height - 5)
+        stamp_forest(room, lake_x, lake_y, size=30)
+
     scatter_tiles(room, TREE, 4)
-    scatter_tiles(room, "O", 10)
+    scatter_tiles(room, ROCK, 10)
     scatter_tiles(room, SPIKE, 5)
     scatter_tiles(room, KEY, 1)
     scatter_tiles(room, EXIT, 1)
 
     player_x = map_width // 2
     player_y = map_height // 2
-    room[player_y][player_x] == "."
+    room[player_y][player_x] == FLOOR
 
     health = 3
     has_key = False
