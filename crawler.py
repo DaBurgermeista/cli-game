@@ -22,7 +22,7 @@ TILE_DATA = {
     ROCK: {"char": "O", "name": "Rock", "color": 3, "walkable": False},
     WATER: {"char": "~", "name": "Water", "color": 6, "walkable": False},
     SPIKE: {"char": "^", "name": "Spike", "color": 4, "walkable": True, "damage": 1},
-    DOOR: {"char": "+", "name": "Door", "color": 3, "walkable": False, "needs_key": True},
+    DOOR: {"char": "+", "name": "Doorway", "color": 3, "walkable": True, "needs_key": False},
     KEY: {"char": "K", "name": "Key", "color": 3, "walkable": True, "pickup": "key"},
     EXIT: {"char": "E", "name": "Exit", "color": 3, "walkable": True, "exit": True},
     BRIDGE: {"char": "=", "name": "Bridge", "color": 3, "walkable": True},
@@ -179,6 +179,58 @@ def stamp_forest_near_water(grid, scale=0.05):
         wx, wy = random.choice(water_tiles)
         stamp_blob(grid, wx, wy, TREE, scale=scale)
 
+def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
+    height = len(grid)
+    width = len(grid)
+
+    # Try 50 times to find a dry, open spot on map
+    for _ in range(50):
+        x1 = random.randint(3, width - w - 4)
+        y1 = random.randint(3, height - h - 4)
+
+        # Check footprint
+        spot_clear = True
+        for y in range(y1 - 1, y1 + h + 1):
+            for x in range(x1 - 1, x1 - w + 1):
+                if grid[y][x] in (WATER, BRIDGE, WALL, DOOR, KEY, EXIT):
+                    spot_clear = False
+                    break
+            if not spot_clear:
+                break
+
+        if spot_clear:
+            for y in range(y1, y1 + h):
+                for x in range(x1, x1 + w):
+                    is_edge = (y == y1 or y == y1 + h - 1 or x == x1 or x == x1 + w - 1)
+                    if is_edge:
+                        if is_ruin and random.random() < 0.25:
+                            grid[y][x] = FLOOR
+                        else:
+                            grid[y][x] = WALL
+                    else:
+                        grid[y][x] = WALL
+
+            # Punch a doorway
+            side = random.choice(["top", "bottom", "left", "right"])
+            if side == "top":
+                grid[y1][x1 + (w // 2)] = DOOR
+            elif side == "bottom":
+                grid[y1 + h - 1][x1 + (w //2)] = DOOR
+            elif side == "left":
+                grid[y1 + (h // 2)][x1] = DOOR
+            elif side == "right":
+                grid[y1 + (h // 2)][x1 + w - 1] = DOOR
+
+            # Place the key, Exit, or loot
+            if interior_item:
+                center_x = x1 + (w // 2)
+                center_y = y1 + (h // 2)
+                grid[center_y][center_x] = interior_item
+
+            return True # Successfully places
+    return False # Could not place
+                    
+
 def main(stdscr):
     # Hide the blinking terminal cursor
     curses.curs_set(0)  
@@ -207,6 +259,12 @@ def main(stdscr):
         stamp_forest_near_water(room, scale=0.05)
 
     scatter_tiles(room, TREE, 4)
+
+    stamp_building(room, w=7, h=5, interior_item=KEY, is_ruin=False)
+    stamp_building(room, w=9, h=6, interior_item=EXIT, is_ruin=True)
+
+    stamp_building(room, w=6, h=5, is_ruin=True)
+    stamp_building(room, w=8, h=5, is_ruin=True)
     
     """ --- Was for testing purposes
     scatter_tiles(room, ROCK, total_tiles // 150)
