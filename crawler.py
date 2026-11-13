@@ -3,7 +3,7 @@ import random
 
 # Constants
 WALL = "#"
-FLOOR = " "
+FLOOR = "."
 DOOR = "+"
 KEY = "K"
 EXIT = "E"
@@ -56,7 +56,10 @@ def draw_map(stdscr, grid, player_x, player_y):
                 stdscr.addstr(y + 2, x, "@", curses.color_pair(5))
             else:
                 color_id = TILE_DATA[tile_char]["color"]
-                stdscr.addstr(y + 2, x, tile_char, curses.color_pair(color_id))
+                attr = curses.color_pair(color_id)
+                if tile_char == FLOOR:
+                    attr |= curses.A_DIM
+                stdscr.addstr(y + 2, x, tile_char, attr)
   
 
 def create_overworld(width, height):
