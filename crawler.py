@@ -107,7 +107,7 @@ def main(stdscr):
     for _ in range(4):
         forest_x = random.randint(5, map_width - 6)
         forest_y = random.randint(4, map_height - 5)
-        stamp_forest(room, forest_x. forest_y, size=30)
+        stamp_forest(room, forest_x, forest_y, size=30)
 
     scatter_tiles(room, "T", 4)
     scatter_tiles(room, "O", 10)
