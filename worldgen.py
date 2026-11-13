@@ -163,3 +163,34 @@ def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
 
             return True # Successfully places
     return False # Could not place
+
+def generate_overworld(map_width, map_height):
+    room = create_overworld(map_width, map_height)
+
+    # Generate Water Features first
+    ## Generate River
+    carve_river(room)
+
+    ## Stamp Lakes
+    for _ in range(3):
+        lake_x = random.randint(5, map_width - 6)
+        lake_y = random.randint(4, map_height - 5)
+        stamp_blob(room, lake_x, lake_y, WATER, scale=0.04)
+
+    # Put forests in by water
+    for _ in range(4):
+        stamp_forest_near_water(room, scale=0.05)
+
+    scatter_tiles(room, TREE, 4)
+
+    stamp_building(room, w=7, h=5, interior_item=KEY, is_ruin=True)
+    stamp_building(room, w=9, h=6, interior_item=EXIT, is_ruin=False)
+
+    stamp_building(room, w=6, h=5, is_ruin=True)
+    stamp_building(room, w=8, h=5, is_ruin=True)
+
+    player_x = map_width // 2
+    player_y = map_height // 2
+    room[player_y][player_x] == FLOOR
+
+    return room, player_x, player_y

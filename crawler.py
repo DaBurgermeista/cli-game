@@ -1,5 +1,4 @@
 import curses
-import random
 from tiles import TILE_DATA, FLOOR, KEY, EXIT, PLAYER
 from worldgen import (
     create_overworld,
@@ -7,6 +6,7 @@ from worldgen import (
     stamp_blob,
     stamp_forest_near_water,
     stamp_building,
+    generate_overworld,
 )
 from render import init_colors, draw_map
 
@@ -22,20 +22,7 @@ def can_enter(tile_char, has_key):
     props = TILE_DATA[tile_char]
     if props.get("needs_key") and has_key:
         return True
-    return props["walkable"]
-
-def scatter_tiles(grid, symbol, count):
-    height = len(grid)
-    width = len(grid[0])
-
-    placed = 0
-    while placed < count:
-        rx = random.randint(2, width - 3)
-        ry = random.randint(2, height - 3)
-
-        if grid[ry][rx] == FLOOR:
-            grid[ry][rx] = symbol
-            placed += 1                 
+    return props["walkable"]                
 
 def main(stdscr):
     # Hide the blinking terminal cursor
@@ -46,35 +33,11 @@ def main(stdscr):
     map_height = max_y - 4
     map_width = max_x - 1  
 
-    room = create_overworld(map_width, map_height)
+    room, player_x, player_y = create_overworld(map_width, map_height)
 
     total_tiles = map_width * map_height
 
-    # Generate Water Features first
-    ## Generate River
-    carve_river(room)
-
-    ## Stamp Lakes
-    for _ in range(3):
-        lake_x = random.randint(5, map_width - 6)
-        lake_y = random.randint(4, map_height - 5)
-        stamp_blob(room, lake_x, lake_y, WATER, scale=0.04)
-
-    # Put forests in by water
-    for _ in range(4):
-        stamp_forest_near_water(room, scale=0.05)
-
-    scatter_tiles(room, TREE, 4)
-
-    stamp_building(room, w=7, h=5, interior_item=KEY, is_ruin=False)
-    stamp_building(room, w=9, h=6, interior_item=EXIT, is_ruin=True)
-
-    stamp_building(room, w=6, h=5, is_ruin=True)
-    stamp_building(room, w=8, h=5, is_ruin=True)
-
-    player_x = map_width // 2
-    player_y = map_height // 2
-    room[player_y][player_x] == FLOOR
+    generate_overworld(map_width, map_height)
 
     health = 3
     has_key = False
