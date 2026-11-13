@@ -224,7 +224,7 @@ def main(stdscr):
     message = "Explore the map!"   
 
     while True:
-        stdscr.clear()
+        stdscr.erase()
         stdscr.addstr(0,0,f"Health: {health} | Key: {'Yes' if has_key else 'No'}")
         
         # 1. Render System draws the whole grid with colors
