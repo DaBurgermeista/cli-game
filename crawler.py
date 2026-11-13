@@ -85,7 +85,7 @@ def scatter_tiles(grid, symbol, count):
             grid[ry][rx] = symbol
             placed += 1
 
-def stamp_forest(grid, center_x, center_y, size=25):
+def stamp_blob(grid, center_x, center_y, tile_type, size=25):
     height = len(grid)
     width = len(grid[0])
 
@@ -94,22 +94,7 @@ def stamp_forest(grid, center_x, center_y, size=25):
     for _ in range(size):
         if 2 < fx < width - 3 and 2 < fy < height - 3:
             if grid[fy][fx] == FLOOR:
-                grid[fy][fx] = TREE
-        
-        dx, dy = random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
-        fx += dx
-        fy += dy
-
-def stamp_lake(grid, center_x, center_y, size=25):
-    height = len(grid)
-    width = len(grid[0])
-
-    fx, fy = center_x, center_y
-
-    for _ in range(size):
-        if 2 < fx < width - 3 and 2 < fy < height - 3:
-            if grid[fy][fx] == FLOOR:
-                grid[fy][fx] = WATER
+                grid[fy][fx] = tile_type
         
         dx, dy = random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
         fx += dx
@@ -130,13 +115,13 @@ def main(stdscr):
     for _ in range(4):
         forest_x = random.randint(5, map_width - 6)
         forest_y = random.randint(4, map_height - 5)
-        stamp_forest(room, forest_x, forest_y, size=30)
+        stamp_blob(room, forest_x, forest_y, TREE, size=30)
 
     # Stamp Lakes
     for _ in range(4):
         lake_x = random.randint(5, map_width - 6)
         lake_y = random.randint(4, map_height - 5)
-        stamp_lake(room, lake_x, lake_y, size=30)
+        stamp_blob(room, lake_x, lake_y, WATER, size=30)
 
     scatter_tiles(room, TREE, 4)
     scatter_tiles(room, ROCK, 10)
