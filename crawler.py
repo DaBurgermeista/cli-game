@@ -9,6 +9,7 @@ from worldgen import (
     generate_overworld
 )
 from render import init_colors, draw_map
+from entities import create_entity, get_entity_at
 
 MAP_WIDTH = 50
 MAP_HEIGHT = 22
@@ -39,12 +40,18 @@ def main(stdscr):
     has_key = False
     message = "Explore the map!"   
 
+    entities = [
+        create_entity("wolf", player_x + 4, player_y)
+        create_entity("deer", player_x - 4, player_y - 2)
+        create_entity("troll", player_x + 6, player_y + 3)
+    ]
+
     while True:
         stdscr.erase()
         stdscr.addstr(0,0,f"Health: {health} | Key: {'Yes' if has_key else 'No'}")
         
         # 1. Render System draws the whole grid with colors
-        draw_map(stdscr, room, player_x, player_y)
+        draw_map(stdscr, room, player_x, player_y, entities)
 
         stdscr.addstr(len(room) + 3, 0, message)
         stdscr.clrtoeol()

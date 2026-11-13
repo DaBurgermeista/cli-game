@@ -11,15 +11,21 @@ def init_colors():
     curses.init_pair(5, curses.COLOR_CYAN, -1)
     curses.init_pair(6, curses.COLOR_BLUE, -1)
 
-def draw_map(stdscr, grid, player_x, player_y):
+def draw_map(stdscr, grid, player_x, player_y, entities):
+    # Draw terrain grid first
     for y, row in enumerate(grid):
         for x, tile_id in enumerate(row):
-            if x == player_x and y == player_y:
-                stdscr.addstr(y + 2, x, "@", curses.color_pair(5))
-            else:
-                props = TILE_DATA[tile_id]
-                color_id = TILE_DATA[tile_id]["color"]
-                attr = curses.color_pair(color_id)
-                if tile_id == FLOOR:
-                    attr |= curses.A_DIM
-                stdscr.addstr(y + 2, x, props["char"], attr)
+            props = TILE_DATA[tile_id]
+            color_id = TILE_DATA[tile_id]["color"]
+            attr = curses.color_pair(color_id)
+            if tile_id == FLOOR:
+                attr |= curses.A_DIM
+            stdscr.addstr(y + 2, x, props["char"], attr)
+
+    # Draw all monsters
+    for entity in entities:
+        attr = curses.color_pair(entity["color"])
+        stdscr.addstr(entity["y"] + 2, entity["x"], entity["char"], attr)
+
+    # Add player last
+    stdscr.addstr(player_y + 2, player_x, "@", curses.color_pair(5))
