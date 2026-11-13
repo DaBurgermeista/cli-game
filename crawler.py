@@ -96,8 +96,8 @@ def main(stdscr):
     scatter_tiles(room, "K", 1)
     scatter_tiles(room, "E", 1)
 
-    player_x == map_width // 2
-    player_y == map_height // 2
+    player_x = map_width // 2
+    player_y = map_height // 2
     room[player_y][player_x] == "."
 
     health = 3
