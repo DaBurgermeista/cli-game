@@ -56,7 +56,7 @@ def draw_map(stdscr, grid, player_x, player_y):
                 stdscr.addstr(y + 2, x, "@", curses.color_pair(5))
             else:
                 props = TILE_DATA[tile_id]
-                color_id = TILE_DATA[tile_char]["color"]
+                color_id = TILE_DATA[tile_id]["color"]
                 attr = curses.color_pair(color_id)
                 if tile_char == FLOOR:
                     attr |= curses.A_DIM
