@@ -20,7 +20,7 @@ TILE_DATA = {
     ROCK: {"name": "Rock", "color": 3, "walkable": False},
     WATER: {"name": "Water", "color": 6, "walkable": False},
     SPIKE: {"name": "Spikes", "color": 4, "walkable": True, "damage": 1},
-    "D": {"name": "Door", "color": 3, "walkable": False, "needs_key": True},
+    DOOR: {"name": "Door", "color": 3, "walkable": False, "needs_key": True},
     KEY: {"name": "Key", "color": 3, "walkable": True, "pickup": "key"},
     EXIT: {"name": "Exit", "color": 3, "walkable": True, "exit": True},
 }
