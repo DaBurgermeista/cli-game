@@ -133,8 +133,11 @@ def main(stdscr):
         stamp_blob(room, lake_x, lake_y, WATER, scale=0.04)
 
     scatter_tiles(room, TREE, 4)
+    
+    """ --- Was for testing purposes
     scatter_tiles(room, ROCK, total_tiles // 150)
     scatter_tiles(room, SPIKE, total_tiles // 250)
+    """
     scatter_tiles(room, KEY, 1)
     scatter_tiles(room, EXIT, 1)
 
