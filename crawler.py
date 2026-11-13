@@ -10,6 +10,17 @@ EXIT = "E"
 SPIKE = "^"
 PLAYER ="@"
 
+TILE_DATA = {
+    ".": {"name": "Floor", "color": 1, "walkable": True},
+    "#": {"name": "Wall", "color": 1, "walkable": False},
+    "T": {"name": "Tree", "color": 2, "walkable": False},
+    "O": {"name": "Rock", "color": 3, "walkable": False},
+    "^": {"name": "Spikes", "color": 4, "walkable": True, "damage": 1},
+    "D": {"name": "Door", "color": 3, "walkable": False, "needs_key": True},
+    "K": {"name": "Key", "color": 3, "walkable": True, "pickup": "key"},
+    "E": {"name": "Exit", "color": 3, "walkable": True, "exit": True},
+}
+
 MAP_WIDTH = 50
 MAP_HEIGHT = 22
 MIN_ROOM_WIDTH = 4
@@ -18,152 +29,85 @@ MIN_ROOM_HEIGHT = 3
 MAX_ROOM_HEIGHT = 5
 # ---
 
-def generate_room(width, height, num_spikes):
-    # 1. Start with a solid block of walls
-    grid = [[WALL for _ in range(width)] for _ in range(height)]
+def init_colors():
+    curses.start_color()
+    curses.use_default_colors()
+    curses.init_pair(1, curses.COLOR_WHITE, -1)
+    curses.init_pair(2, curses.COLOR_GREEN, -1)
+    curses.init_pair(3, curses.COLOR_YELLOW, -1)
+    curses.init_pair(4, curses.COLOR_RED, -1)
+    curses.init_pair(5, curses.COLOR_CYAN, -1)
 
-    # 2. Carve out open floor inside the outer border and collect open floor tiles
-    floor_tiles = []
-    for y in range(1, height - 1):
-        for x in range(1, width - 1):
-            grid[y][x] = FLOOR
-            floor_tiles.append((x, y))
+def can_enter(tile_char, has_key):
+    props = TILE_DATA[tile_char]
+    if props.get("needs_key") and has_key:
+        return True
+    return props["walkable"]
 
-    # Shuffle the list so popping from it gives guaranteed unique positions
-    random.shuffle(floor_tiles)
+def draw_map(stdscr, grid, player_x, player_y):
+    for y, row in enumerate(grid):
+        for x, tile_char in enumerate(row):
+            if x == player_x and y == player_y:
+                stdscr.addstr(y + 2, x, "@", curses.color_pair(5))
+            else:
+                color_id = TILE_DATA[tile_char]["color"]
+                stdscr.addstr(y + 2, x, tile_char, curses.color_pair(color_id))
+  
 
-    # Place the player, key, exit, and spikes without overlapping
-    start_x, start_y = floor_tiles.pop()
+def create_overworld(width, height):
+    grid = [["." for _ in range(width)] for _ in range(height)]
 
-    key_x, key_y = floor_tiles.pop()
-    grid[key_y][key_x] = KEY
+    for x in range(width):
+        grid[x] = "#"
+        grid[height - 1][x] = "#"
 
-    exit_x, exit_y = floor_tiles.pop()
-    grid[exit_y][exit_x] = EXIT
+    for y in range(height):
+        grid[y] = "#"
+        grid[y][width - 1] = "#"
 
-    for _ in range(num_spikes):
-        if floor_tiles:
-            sx, sy = floor_tiles.pop()
-            grid[sy][sx] = SPIKE
+    return grid
 
-    return grid, start_x, start_y
+def scatter_tiles(grid, symbol, count):
+    height = len(grid)
+    width = len(grid)
 
-def can_enter(tile, has_key):
-    return tile != WALL
+    placed = 0
+    while placed < count:
+        rx = random.randint(2, width - 3)
+        ry = random.randint(2, height - 3)
 
-def is_area_solid(grid, x1, y1, w, h):
-    # Make sure the room itself stays inside the outer wall border
-    if x1 < 1 or y1 < 1:
-        return False
-
-    if x1 + w > len(grid[0]) - 1:
-        return False
-
-    if y1 + h > len(grid) - 1:
-        return False
-
-    # Check only the proposed room tiles.
-    # Do not check the surrounding border, because one side touches the hallway.
-    for y in range(y1, y1 + h):
-        for x in range(x1, x1 + w):
-            if grid[y][x] != WALL:
-                return False
-
-    return True
-
-def add_doors_to_room(grid, rx, ry, rw, rh, max_doors=2):
-    possible_doors = []
-
-    # Collect valid spots for doors on top and bottom walls
-    for x in range(rx, rx + rw):
-        possible_doors.append((x, ry - 1))
-        possible_doors.append((x, ry + rh))
-
-    # Collect valid door spots for left and right walls
-    for y in range(ry, ry + rh):
-        possible_doors.append((rx - 1, y))
-        possible_doors.append((rx + rw, y))
-
-    # Shuffle so doors appear on random walls
-    random.shuffle(possible_doors)
-
-    doors_placed = 0
-    for dx, dy in possible_doors:
-        if doors_placed >= max_doors:
-            break
-
-        # Make sure the door isn't on the outer edge of the map
-        # and make sure it is a solid wall
-        if 1 <= dx < len(grid[0]) - 1 and 1 <= dy < len(grid) - 1:
-            if grid[dy][dx] == WALL:
-                grid[dy][dx] = "+"
-                doors_placed += 1
-    
-
-def expand_from_door(grid, door_x, door_y, dx, dy):
-    # Turn '+' door just stepped on into an open floor
-    grid[door_y][door_x] = FLOOR
-    hall_length = random.randint(2, 4)
-
-    # 1. Dig the hallway
-    hx, hy = door_x, door_y
-    for _ in range(hall_length):
-        next_hx, next_hy = hx + dx, hy + dy
-        # Stop if about to hit map edge
-        if next_hx < 2 or next_hx >= len(grid[0]) - 2 or next_hy < 2 or next_hy >= len(grid) - 2:
-            return
-        hx, hy = next_hx, next_hy
-        grid[hy][hx] = FLOOR
-
-    # 2. Pick a random size for the new room
-    rw = random.randint(MIN_ROOM_WIDTH, MAX_ROOM_WIDTH)
-    rh = random.randint(MIN_ROOM_HEIGHT, MAX_ROOM_HEIGHT)
-
-    # Postion the room depending on direction walked
-    if dx == 1:
-        rx, ry = hx + 1, hy - (rh // 2)
-    elif dx == -1:
-        rx, ry = hx - rw, hy - (rh // 2)
-    elif dy == 1:
-        rx, ry = hx - (rw // 2), hy + 1
-    elif dy == -1:
-        rx, ry = hx - (rw // 2), hy - rh
-
-    # 3. Only carve the room if the space is untouched
-    if is_area_solid(grid, rx, ry, rw, rh):
-        for y in range(ry, ry + rh):
-            for x in range(rx, rx + rw):
-                grid[y][x] = FLOOR
-        # Add 1 or 2 new '+' doors
-        add_doors_to_room(grid, rx, ry, rw, rh)
-
-    
+        if grid[ry][rx] == ".":
+            grid[ry][rx] == symbol
+            placed += 1
 
 def main(stdscr):
     # Hide the blinking terminal cursor
-    curses.curs_set(0)    
+    curses.curs_set(0)  
+    init_colors()
 
-    floor = 1
+    max_y, max_x = stdscr.getmaxyx()
+    map_height = max_y - 4
+    map_width = max_x - 1  
+
+    room = create_overworld(map_width, map_height)
+    scatter_tiles(room, "T", 25)
+    scatter_tiles(room, "O", 10)
+    scatter_tiles(room, "^", 5)
+    scatter_tiles(room, "K", 1)
+    scatter_tiles(room, "E", 1)
+
+    player_x == map_width // 2
+    player_y == map_height // 2
+    room[player_y][player_x] == "."
+
     health = 3
     has_key = False
-    message = f"Floor {floor}: Find the key and reach the exit!"
-    
-    room  = [[WALL for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
-    
-    start_rx, start_ry, start_rw, start_rh = 22, 9, 6, 4
-    for y in range(start_ry, start_ry + start_rh):
-        for x in range(start_rx, start_rx + start_rw):
-            room[y][x] = FLOOR
-
-    add_doors_to_room(room, start_rx, start_ry, start_rw, start_rh, max_doors=3)
-
-    player_x = start_rx + 2
-    player_y = start_ry + 2    
+    message = "Explore the map!"   
 
     while True:
         stdscr.clear()
         
-        stdscr.addstr(0,0,f"Floor: {floor} | Health: {health} | Key: {'Yes' if has_key else 'No'}")
+        stdscr.addstr(0,0,f"Health: {health} | Key: {'Yes' if has_key else 'No'}")
         
         # Build room on screen from raw_room        
         for y, row in enumerate(room):
@@ -193,35 +137,30 @@ def main(stdscr):
         elif key in (ord("d"), curses.KEY_RIGHT):
             next_x += 1
 
+        # 3. Movement System checks TILE_DATA
         if can_enter(room[next_y][next_x], has_key):
-            dx = next_x - player_x
-            dy = next_y - player_y
             player_x, player_y = next_x, next_y
-            
-            if room[player_y][player_x] == DOOR:
-                expand_from_door(room, player_x, player_y, dx, dy)
-                message = "You opened a door into the unknown!"
-            
 
+        # 4. Interaction System reads flags from TILE_DATA
         current_tile = room[player_y][player_x]
+        props = TILE_DATA[current_tile]
         
-        if current_tile  == KEY:
+        if props.get("pickup")  == "key":
             message = "You found a key"
             has_key = True
             room[player_y][player_x] = FLOOR
-        if current_tile == EXIT:
-            message = "You escaped!"
-            break
-        if current_tile  == DOOR:
-            message = "You open the door."
+        
+        if props.get("need_key"):
             room[player_y][player_x] = FLOOR
-        if health == 0:
-            message = "You died."
-            stdscr.getkey()
+            message = "You unlocked the door!"
+        
+        if "damage" in props:
+            health -= props["damage"]
+            message = f"Ouch! You took {props['damage']} damage! from a {props['name']}!"
+            if health <= 0:
+                break
+
+        if props.get("exit"):
             break
-        if current_tile == SPIKE:
-            room[player_y][player_x] = FLOOR
-            health = max(0, health - 3)
-            message = "Ouch! You stepped on a spike!"
 
 curses.wrapper(main)
