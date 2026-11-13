@@ -113,11 +113,11 @@ def main(stdscr):
         forest_y = random.randint(4, map_height - 5)
         stamp_forest(room, forest_x, forest_y, size=30)
 
-    scatter_tiles(room, "T", 4)
+    scatter_tiles(room, TREE, 4)
     scatter_tiles(room, "O", 10)
-    scatter_tiles(room, "^", 5)
-    scatter_tiles(room, "K", 1)
-    scatter_tiles(room, "E", 1)
+    scatter_tiles(room, SPIKE, 5)
+    scatter_tiles(room, KEY, 1)
+    scatter_tiles(room, EXIT, 1)
 
     player_x = map_width // 2
     player_y = map_height // 2
