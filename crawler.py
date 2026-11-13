@@ -58,18 +58,18 @@ def create_overworld(width, height):
     grid = [["." for _ in range(width)] for _ in range(height)]
 
     for x in range(width):
-        grid[x] = "#"
+        grid[0][x] = "#"
         grid[height - 1][x] = "#"
 
     for y in range(height):
-        grid[y] = "#"
+        grid[y][0] = "#"
         grid[y][width - 1] = "#"
 
     return grid
 
 def scatter_tiles(grid, symbol, count):
     height = len(grid)
-    width = len(grid)
+    width = len(grid[0])
 
     placed = 0
     while placed < count:
