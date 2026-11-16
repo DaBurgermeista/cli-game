@@ -187,8 +187,26 @@ def generate_overworld(map_width, map_height):
         stamp_forest_near_water(room, scale=0.05)
         
 
-    stamp_building(room, w=7, h=5, interior_item=KEY, is_ruin=True)
-    stamp_building(room, w=9, h=6, interior_item=EXIT, is_ruin=False)
+    key_placed = stamp_building(
+        room, 
+        w=7, 
+        h=5, 
+        interior_item=KEY, 
+        is_ruin=True,
+    )
+    exit_placed = stamp_building(
+        room, 
+        w=9, 
+        h=6, 
+        interior_item=EXIT, 
+        is_ruin=False,
+    )
+
+    if not key_placed:
+        raise RuntimeError("Could not place the key building.")
+
+    if not exit_placed:
+        raise RuntimeError("Could not place the exit building.")
 
     stamp_building(room, w=6, h=5, is_ruin=True)
     stamp_building(room, w=8, h=5, is_ruin=True)
