@@ -54,7 +54,10 @@ def main(stdscr):
     # Hide the blinking terminal cursor
     curses.curs_set(0)  
     init_colors()
+
+    # Debugs
     debug_reveal_map = False
+    debug_elevation = False
 
     room, elevation, player_x, player_y = generate_overworld(
         WORLD_WIDTH, 
@@ -116,9 +119,15 @@ def main(stdscr):
         stdscr.erase()
 
         # HUD Rendering
+        debug_label = ""
+
+        if debug_elevation:
+            debug_label = " | Elevation: On"
+
         hud = (
             f"Health: {health} | Key: {'Yes' if has_key else 'No'} "
             f"| Pos: {player_x}, {player_y}"
+            f"{debug_label}"
         )
         stdscr.addnstr(0, 0, hud, max_x - 1)
         
@@ -131,8 +140,26 @@ def main(stdscr):
                 for x in range(len(room[0]))
             }
 
-        for x, y in visible_tiles:
+        natural_visible_tiles = get_visible_tiles(
+            room,
+            player_x,
+            player_y,
+            radius=8,
+        )
+
+        # Only genuine player visibility permanently reveals map tiles.
+        for x, y in natural_visible_tiles:
             explored_tiles[y][x] = True
+
+        # Debug views can display the whole map without permanently exploring it.
+        if debug_reveal_map or debug_elevation:
+            display_visible_tiles = {
+                (x, y)
+                for y in range(len(room))
+                for x in range(len(room[0]))
+            }
+        else:
+            display_visible_tiles = natural_visible_tiles
 
         # 1. Render System draws the whole grid with colors
         draw_map(stdscr, 
@@ -144,8 +171,10 @@ def main(stdscr):
             camera_y,
             view_width,
             view_height,
+            display_visible_tiles,
             visible_tiles,
             explored_tiles,
+            show_elevation=debug_elevation,
         )
 
         log_y = MAP_TOP + view_height
@@ -173,7 +202,15 @@ def main(stdscr):
                 else "Debug map reveal disabled."
             ))
             continue
+        if key == ord("e"):
+            debug_elevation = not debug_elevation
 
+            if debug_elevation:
+                add_message(messages, "Elevation debug view enabled.")
+            else:
+                add_message(messages, "Elevation debug view disabled.")
+
+            continue
         next_x, next_y = player_x, player_y
 
         if key in (ord("w"), curses.KEY_UP):
