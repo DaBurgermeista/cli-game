@@ -10,6 +10,7 @@ from tiles import (
     BRIDGE,
     BANK,
     SHRINE,
+    ROCK,
 )
 
 def create_overworld(width, height):
