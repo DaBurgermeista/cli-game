@@ -11,7 +11,10 @@ def init_colors():
     curses.init_pair(5, curses.COLOR_CYAN, -1)
     curses.init_pair(6, curses.COLOR_BLUE, -1)
 
-def draw_map(stdscr, grid, player_x, player_y, entities, camera_x, camera_y, view_width, view_height, visible_tiles, explore_tiles,):
+def draw_map(stdscr, grid, player_x, player_y, entities, 
+    camera_x, camera_y, view_width, view_height, 
+    visible_tiles, explore_tiles,
+):
     # Draw terrain grid first
     for screen_y in range(view_height):
         world_y = camera_y + screen_y

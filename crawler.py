@@ -82,7 +82,18 @@ def main(stdscr):
             explored_tiles[y][x] = True
 
         # 1. Render System draws the whole grid with colors
-        draw_map(stdscr, room, player_x, player_y, entities)
+        draw_map(stdscr, 
+            room, 
+            player_x, 
+            player_y, 
+            entities, 
+            camera_x,
+            camera_y,
+            view_width,
+            view_height,
+            visible_tiles,
+            explored_tiles,
+        )
 
         stdscr.addstr(len(room) + 3, 0, message)
         stdscr.clrtoeol()
