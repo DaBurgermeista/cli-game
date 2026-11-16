@@ -3,7 +3,7 @@ import curses
 from entities import create_entity, get_entity_at
 from render import draw_map, init_colors
 from tiles import FLOOR, TILE_DATA
-from worldgen import generate_overworld
+from worldgen import generate_overworld, find_open_floor
 
 def can_enter(tile_char, has_key):
     props = TILE_DATA[tile_char]
@@ -22,14 +22,24 @@ def main(stdscr):
 
     room, player_x, player_y = generate_overworld(map_width, map_height)
 
+    occupied = {(player_x, player_y)}
+
+    wolf_x, wolf_y = find_open_floor(room, occupied)
+    occupied.add((wold_x, wolf_y))
+
+    deer_x, deer_y = find_open_floor(room, occupied)
+    occupied.add((deer_x, deer_y))
+
+    troll_x, troll_y = find_open_floor(room, occupied)
+
     health = 3
     has_key = False
     message = "Explore the map!"   
 
     entities = [
-        create_entity("wolf", player_x + 4, player_y),
-        create_entity("deer", player_x - 4, player_y - 2),
-        create_entity("troll", player_x + 6, player_y + 3),
+        create_entity("wolf", wolf_x, wolf_y),
+        create_entity("deer", deer_x, deer_y),
+        create_entity("troll", troll_x, troll_y),
     ]
 
     while True:
