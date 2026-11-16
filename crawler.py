@@ -56,7 +56,10 @@ def main(stdscr):
     init_colors()
     debug_reveal_map = False
 
-    room, player_x, player_y = generate_overworld(WORLD_WIDTH, WORLD_HEIGHT)
+    room, elevation, player_x, player_y = generate_overworld(
+        WORLD_WIDTH, 
+        WORLD_HEIGHT
+    )
 
     explored_tiles = [
         [False for _ in range(WORLD_WIDTH)]
