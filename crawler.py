@@ -95,8 +95,12 @@ def main(stdscr):
             explored_tiles,
         )
 
-        stdscr.addstr(len(room) + 3, 0, message)
+        message_y = max_y - 1
+
+        stdscr.move(message_y, 0)
         stdscr.clrtoeol()
+        stdscr.addnstr(message_y, 0, message, max_x - 1)
+        
         stdscr.refresh()
 
         key = stdscr.getch()
