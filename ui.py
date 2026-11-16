@@ -2,7 +2,7 @@ import curses
 import textwrap
 
 
-def show_lore(stdscr, title, text):
+def show_text_panel(stdscr, title, text):
     max_y, max_x = stdscr.getmaxyx()
 
     # Keep a margin around the panel and ensure a usable minimum size.
