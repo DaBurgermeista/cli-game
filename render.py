@@ -14,7 +14,7 @@ def init_colors():
 def draw_map(stdscr, grid, player_x, player_y, entities, camera_x, camera_y, view_width, view_height, visible_tiles, explore_tiles,):
     # Draw terrain grid first
     for screen_y in range(view_height):
-    world_y = camera_y + screen_y
+        world_y = camera_y + screen_y
 
     for screen_x in range(view_width):
         world_x = camera_x + screen_x
