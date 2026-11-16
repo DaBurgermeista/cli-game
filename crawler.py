@@ -86,7 +86,10 @@ def main(stdscr):
         stdscr.erase()
 
         # HUD Rendering
-        hud = f"Health: {health} | Key: {'Yes' if has_key else 'No'}"
+        hud = (
+            f"Health: {health} | Key: {'Yes' if has_key else 'No'} "
+            f"| Pos: {player_x}, {player_y}"
+        )
         stdscr.addnstr(0, 0, hud, max_x - 1)
         
         visible_tiles = get_visible_tiles(room, player_x, player_y, radius=8)
