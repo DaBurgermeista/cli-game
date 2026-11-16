@@ -5,6 +5,7 @@ from render import draw_map, init_colors
 from tiles import FLOOR, TILE_DATA
 from worldgen import generate_overworld, find_open_floor
 from vision import get_visible_tiles
+from ui import show_lore
 
 WORLD_WIDTH = 100
 WORLD_HEIGHT = 60
@@ -193,6 +194,9 @@ def main(stdscr):
             message = f"Ouch! You took {props['damage']} damage! from a {props['name']}!"
             if health <= 0:
                 break
+        
+        if "lore" in props:
+            show_lore(stdscr, props["name"], props["lore"])
 
         if props.get("exit"):
             break

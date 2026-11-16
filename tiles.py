@@ -31,6 +31,12 @@ TILE_DATA = {
         "name": "Ancient Shrine",
         "color": 5,
         "walkable": True,
-        "enter_msg": "You discover an ancient shrine. Its stone is warm to the touch."
+        "enter_msg": "You discover an ancient shrine. Its stone is warm to the touch.",
+        "lore": (
+            "The stones are warm despite the cold wind.\n\n"
+            "A faded inscription circles the altar:\n\n"
+            "\"Those who walk beyond the river should remember "
+            "what the forest has taken.\""
+        ),
     },
 }
