@@ -11,30 +11,55 @@ def init_colors():
     curses.init_pair(5, curses.COLOR_CYAN, -1)
     curses.init_pair(6, curses.COLOR_BLUE, -1)
 
-def draw_map(stdscr, grid, player_x, player_y, entities):
+def draw_map(stdscr, grid, player_x, player_y, entities, camera_x, camera_y, view_width, view_height, visible_tiles, explore_tiles,):
     # Draw terrain grid first
-    for y, row in enumerate(grid):
-        for x, tile_id in enumerate(row):
-            props = TILE_DATA[tile_id]
-            color_id = props["color"]
-            attr = curses.color_pair(color_id)
-            if tile_id == FLOOR:
-                attr |= curses.A_DIM
-            stdscr.addstr(y + 2, x, props["char"], attr)
+    for screen_y in range(view_height):
+    world_y = camera_y + screen_y
+
+    for screen_x in range(view_width):
+        world_x = camera_x + screen_x
+
+        if world_y >= len(grid) or world_x >= len(grid[0]):
+            continue
+
+        tile_id = grid[world_y][world_x]
+        props = TILE_DATA[tile_id]
+
+        if not explored_tiles[world_y, world_x]:
+            stdscr.addstr(screen_y + 2, screen_x, " ")
+        
+        is_visible =  (world_x, world_y) in visible_tiles
+
+        attr = curses.color_pair(props["color"])
+        if not is_visible:
+            attr |= curses.A_DIM
+
+
+        stdscr.addstr(
+            screen_y + 2,
+            screen_x,
+            props["char"],
+            attr,
+        )
 
     map_height = len(grid)
     map_width = len(grid[0]) if grid else 0
 
-    # Draw all monsters
+    # Draw entities
     for entity in entities:
-        if 0 <= entity["x"] < map_width and 0 <= entity["y"] < map_height:
-            attr = curses.color_pair(entity["color"])
-            stdscr.addstr(
-                entity["y"] + 2, 
-                entity["x"], 
-                entity["char"], 
-                attr,
-            )
+    if (entity["x"], entity["y"]) not in visible_tiles:
+        continue
+
+    screen_x = entity["x"] - camera_x
+    screen_y = entity["y"] - camera_y
+
+    if 0 <= screen_x < view_width and 0 <= screen_y < view_height:
+        stdscr.addstr(
+            screen_y + 2,
+            screen_x,
+            entity["char"],
+            curses.color_pair(entity["color"]),
+        )
 
     # Add player last
     stdscr.addstr(

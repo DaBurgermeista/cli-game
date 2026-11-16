@@ -4,6 +4,10 @@ from entities import create_entity, get_entity_at
 from render import draw_map, init_colors
 from tiles import FLOOR, TILE_DATA
 from worldgen import generate_overworld, find_open_floor
+from vision import get_visible_tiles
+
+WORLD_WIDTH = 100
+WORLD_HEIGHT = 60
 
 def can_enter(tile_char, has_key):
     props = TILE_DATA[tile_char]
@@ -11,16 +15,29 @@ def can_enter(tile_char, has_key):
         return True
     return props["walkable"]                
 
+def get_camera(player_x, player_y, map_width, map_height, view_width, view_height):
+    camera_x = player_x - (view_width // 2)
+    camera_y = player_y - (view_height // 2)
+
+    max_camera_x = max(0, map_width - view_width)
+    max_camera_y = max(0, map_height - view_height)
+
+    camera_x = max(0, min(camera_x, max_camera_x))
+    camera_y = max(0, min(camera_y, max_camera_y))
+
+    return camera_x, camera_y
+
 def main(stdscr):
     # Hide the blinking terminal cursor
     curses.curs_set(0)  
     init_colors()
 
-    max_y, max_x = stdscr.getmaxyx()
-    map_height = max_y - 4
-    map_width = max_x - 1  
+    room, player_x, player_y = generate_overworld(WORLD_WIDTH, WORLD_HEIGHT)
 
-    room, player_x, player_y = generate_overworld(map_width, map_height)
+    explored_tiles = [
+        [False for _ in range(WORLD_WIDTH)]
+        for _ in range(WORLD_HEIGHT)
+    ]
 
     occupied = {(player_x, player_y)}
 
@@ -43,9 +60,27 @@ def main(stdscr):
     ]
 
     while True:
+
+        max_y, max_x = stdscr.getmaxyx()
+        view_height = max_y - 4
+        view_width = max_x - 1
+
+        camera_x, camera_y = get_camera(
+            player_x,
+            player_y,
+            len(room[0]),
+            len(room),
+            view_width,
+            view_height,
+        )
+
         stdscr.erase()
         stdscr.addstr(0,0,f"Health: {health} | Key: {'Yes' if has_key else 'No'}")
         
+        visible_tiles = get_visible_tiles(room, player_x, player_y, radius=8)
+        for x, y in visible_tiles:
+            explored_tiles[y][x] = True
+
         # 1. Render System draws the whole grid with colors
         draw_map(stdscr, room, player_x, player_y, entities)
 

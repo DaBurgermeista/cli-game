@@ -14,8 +14,8 @@ BRIDGE = "bridge"
 BANK = "bank"
 
 TILE_DATA = {
-    FLOOR:  {"char": ".", "name": "Floor",      "color": 1, "walkable": True},
-    WALL:   {"char": "#", "name": "Wall",       "color": 1, "walkable": False,  "bump_msg": "Solid stone blocks your path."},
+    FLOOR:  {"char": ".", "name": "Floor",      "color": 1, "walkable": True, "blocks_sight": False},
+    WALL:   {"char": "#", "name": "Wall",       "color": 1, "walkable": False, "blocks_sight": True,  "bump_msg": "Solid stone blocks your path."},
     TREE:   {"char": "T", "name": "Tree",       "color": 2, "walkable": True,   "enter_msg": "You push through the forest canopy."},
     ROCK:   {"char": "O", "name": "Rock",       "color": 3, "walkable": False},
     WATER:  {"char": "~", "name": "Water",      "color": 6, "walkable": False,  "bump_msg": "The river current is too deep to cross."},
