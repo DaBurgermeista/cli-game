@@ -200,7 +200,7 @@ def main(stdscr):
                 message = target_props.get("enter_msg", "")
 
             else:
-                add_message(target_props.get(
+                add_message(messages, target_props.get(
                         "bump_msg",
                         "Something blocks your way.",
                     ),
