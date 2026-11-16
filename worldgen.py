@@ -160,7 +160,7 @@ def find_open_floor(grid, occupied=None):
     floor_tiles = []
 
     for y in range(1, len(grid) - 1):
-        for x in range(1, len(grid[0] - 1)):
+        for x in range(1, len(grid[0]) - 1):
             if grid[y][x] == FLOOR and (x, y) not in occupied:
                 floor_tiles.append((x, y))
 
