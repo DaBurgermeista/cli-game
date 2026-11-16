@@ -1,5 +1,5 @@
 import curses
-from tiles import TILE_DATA, FLOOR, PLAYER
+from tiles import TILE_DATA, FLOOR
 
 def init_colors():
     curses.start_color()
