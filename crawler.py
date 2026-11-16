@@ -162,18 +162,19 @@ def main(stdscr):
             display_visible_tiles = natural_visible_tiles
 
         # 1. Render System draws the whole grid with colors
-        draw_map(stdscr, 
-            room, 
-            player_x, 
-            player_y, 
-            entities, 
+        draw_map(
+            stdscr,
+            room,
+            player_x,
+            player_y,
+            entities,
             camera_x,
             camera_y,
             view_width,
             view_height,
             display_visible_tiles,
-            visible_tiles,
             explored_tiles,
+            elevation=elevation,
             show_elevation=debug_elevation,
         )
 
