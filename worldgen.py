@@ -9,6 +9,7 @@ from tiles import (
     WATER,
     BRIDGE,
     BANK,
+    SHRINE,
 )
 
 def create_overworld(width, height):
@@ -151,6 +152,47 @@ def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
             return True # Successfully places
     return False # Could not place
 
+def stamp_shrine(grid):
+    height = len(grid)
+    width = len(grid[0])
+
+    # 5 x 5 landmark needs a one-tile safety margin around it
+    for _ in range(50):
+        center_x = random.randint(3, width - 4)
+        center_y = random.randint(3, height - 4)
+
+        # Only place the shring on ordinary open floor
+        spot_clear = True
+
+        for y in range(center_y - 2, center_y + 3):
+            for x in range(center_x - 2, center_x + 3):
+                if grid[y][x] != FLOOR:
+                    spot_clear = False
+                    break
+            
+            if not spot_clear:
+                break
+
+        if not spot_clear:
+            continue
+
+        # Four standing stones around a walkable shrine center
+        grid[center_y - 2][center_x - 1] = ROCK
+        grid[center_y - 2][center_x + 1] = ROCK
+        grid[center_y + 2][center_x - 1] = ROCK
+        grid[center_y + 2][center_x + 1] = ROCK
+
+        grid[center_y][center_x] = SHRINE
+
+        return {
+            "kind": "shrine",
+            "x": center_x,
+            "y": center_y,
+        }
+
+    return None
+
+
 def find_open_floor(grid, occupied=None):
     if occupied is None:
         occupied = set()
@@ -208,6 +250,11 @@ def generate_overworld(map_width, map_height):
 
     stamp_building(room, w=6, h=5, is_ruin=True)
     stamp_building(room, w=8, h=5, is_ruin=True)
+
+    shrine = stamp_shrine(room)
+
+    if shrine is None:
+        raise RuntimeError("Could not place shrine.")
 
     player_x, player_y = find_open_floor(room)
 
