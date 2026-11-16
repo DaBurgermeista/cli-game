@@ -19,3 +19,11 @@ Early Python/curses exploration-game prototype.
 ## Status
 
 Early development prototype. Gameplay systems and objectives are still in progress.
+
+## v0.2.0
+
+- Added tall-grass terrain patches
+- Added ancient shrine and abandoned-camp landmarks
+- Added reusable modal text panels for discoveries and future dialogue
+- Added a persistent message log
+- Improved map variety and exploration feedback
