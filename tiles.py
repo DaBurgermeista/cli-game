@@ -14,6 +14,15 @@ BRIDGE = "bridge"
 BANK = "bank"
 SHRINE = "shrine"
 
+SHRINE_TEXT = (
+    "The shrine is older than any stonework you have seen in the nearby "
+    "ruins. Four weathered pillars surround a low altar marked with a "
+    "single flowing line.\n\n"
+    "When you place a hand on the stone, the river answers somewhere in "
+    "the distance.\n\n"
+    "For a moment, you are certain the forest is listening."
+)
+
 TILE_DATA = {
     FLOOR:  {"char": ".", "name": "Floor",      "color": 1, "walkable": True, "blocks_sight": False},
     WALL:   {"char": "#", "name": "Wall",       "color": 1, "walkable": False, "blocks_sight": True,  "bump_msg": "Solid stone blocks your path."},
@@ -32,11 +41,6 @@ TILE_DATA = {
         "color": 5,
         "walkable": True,
         "enter_msg": "You discover an ancient shrine. Its stone is warm to the touch.",
-        "lore": (
-            "The stones are warm despite the cold wind.\n\n"
-            "A faded inscription circles the altar:\n\n"
-            "\"Those who walk beyond the river should remember "
-            "what the forest has taken.\""
-        ),
+        "text": SHRINE_TEXT,
     },
 }

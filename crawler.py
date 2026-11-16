@@ -10,6 +10,16 @@ from ui import show_text_panel
 WORLD_WIDTH = 100
 WORLD_HEIGHT = 60
 
+INTRO_TITLE = "The Quiet River"
+INTRO_TEXT = (
+    "For three days, you have followed the river north.\n\n"
+    "The water runs cold, but the banks are warm beneath your boots. "
+    "No birds call from the trees, and every trail seems to lead deeper "
+    "into the forest.\n\n"
+    "The last settlement spoke of old shrines waking in the wilds. "
+    "You came to see whether the stories were true."
+)
+
 def can_enter(tile_char, has_key):
     props = TILE_DATA[tile_char]
     if props.get("needs_key") and has_key:
@@ -60,6 +70,8 @@ def main(stdscr):
         create_entity("deer", deer_x, deer_y),
         create_entity("troll", troll_x, troll_y),
     ]
+
+    show_text_panel(stdscr, INTRO_TITLE, INTRO_TEXT)
 
     while True:
 
@@ -195,7 +207,7 @@ def main(stdscr):
             if health <= 0:
                 break
         
-        if "lore" in props:
+        if "text" in props:
             show_text_panel(stdscr, props["name"], props["lore"])
 
         if props.get("exit"):
