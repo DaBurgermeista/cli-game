@@ -197,7 +197,7 @@ def main(stdscr):
 
             elif can_enter(target_tile, has_key):
                 player_x, player_y = next_x, next_y
-                message = target_props.get("enter_msg", "")
+                add_message(messages, target_props.get("enter_msg", ""))
 
             else:
                 add_message(messages, target_props.get(
