@@ -47,8 +47,8 @@ def draw_map(stdscr, grid, player_x, player_y, entities, camera_x, camera_y, vie
 
     # Draw entities
     for entity in entities:
-    if (entity["x"], entity["y"]) not in visible_tiles:
-        continue
+        if (entity["x"], entity["y"]) not in visible_tiles:
+            continue
 
     screen_x = entity["x"] - camera_x
     screen_y = entity["y"] - camera_y
