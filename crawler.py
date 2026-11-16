@@ -208,7 +208,7 @@ def main(stdscr):
                 break
         
         if "text" in props:
-            show_text_panel(stdscr, props["name"], props["lore"])
+            show_text_panel(stdscr, props["name"], props["text"])
 
         if props.get("exit"):
             show_text_panel(stdscr, "Victory!", "Good Job! You found the super easy to get to exit!\n")
