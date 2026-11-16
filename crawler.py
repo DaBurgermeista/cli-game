@@ -62,6 +62,14 @@ def main(stdscr):
     while True:
 
         max_y, max_x = stdscr.getmaxyx()
+    
+        if max_y < 10 or max_x < 20:
+            stdscr.erase()
+            stdscr.addstr(0, 0, "Terminal too small. Resize it to continue.")
+            stdscr.refresh()
+            stdscr.getch()
+            continue
+
         view_height = max_y - 4
         view_width = max_x - 1
 
@@ -75,7 +83,10 @@ def main(stdscr):
         )
 
         stdscr.erase()
-        stdscr.addstr(0,0,f"Health: {health} | Key: {'Yes' if has_key else 'No'}")
+
+        # HUD Rendering
+        hud = f"Health: {health} | Key: {'Yes' if has_key else 'No'}"
+        stdscr.addnstr(0, 0, hud, max_x - 1)
         
         visible_tiles = get_visible_tiles(room, player_x, player_y, radius=8)
         for x, y in visible_tiles:
@@ -100,7 +111,7 @@ def main(stdscr):
         stdscr.move(message_y, 0)
         stdscr.clrtoeol()
         stdscr.addnstr(message_y, 0, message, max_x - 1)
-        
+
         stdscr.refresh()
 
         key = stdscr.getch()
@@ -123,21 +134,25 @@ def main(stdscr):
         # 3. Movement System checks TILE_DATA
         if (next_x, next_y) != (player_x, player_y):
             if not (0 <= next_y < len(room) and 0 <= next_x < len(room[0])):
-                message("You cannot go that way.")
+                message = "You cannot go that way."
                 continue
 
             target_tile = room[next_y][next_x]
             target_props = TILE_DATA[target_tile]
             target_entity = get_entity_at(entities, next_x, next_y)
-            
-            if target_entity != None:
+
+            if target_entity is not None:
                 message = f"A {target_entity['name']} blocks your path!"
 
             elif can_enter(target_tile, has_key):
                 player_x, player_y = next_x, next_y
                 message = target_props.get("enter_msg", "")
+
             else:
-                message = target_props.get("bump_msg", "Something blocks your way.")
+                message = target_props.get(
+                    "bump_msg",
+                    "Something blocks your way.",
+                )
 
         # 4. Interaction System reads flags from TILE_DATA
         current_tile = room[player_y][player_x]

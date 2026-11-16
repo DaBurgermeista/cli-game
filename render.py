@@ -1,15 +1,20 @@
 import curses
-from tiles import TILE_DATA, FLOOR
+
+from tiles import FLOOR, TILE_DATA
+
 
 def safe_addch(stdscr, y, x, char, attr=0):
     max_y, max_x = stdscr.getmaxyx()
 
+    # Do not write to the terminal's final column. Curses can error there.
     if 0 <= y < max_y and 0 <= x < max_x - 1:
         stdscr.addch(y, x, char, attr)
+
 
 def init_colors():
     curses.start_color()
     curses.use_default_colors()
+
     curses.init_pair(1, curses.COLOR_WHITE, -1)
     curses.init_pair(2, curses.COLOR_GREEN, -1)
     curses.init_pair(3, curses.COLOR_YELLOW, -1)
@@ -17,63 +22,77 @@ def init_colors():
     curses.init_pair(5, curses.COLOR_CYAN, -1)
     curses.init_pair(6, curses.COLOR_BLUE, -1)
 
-def draw_map(stdscr, grid, player_x, player_y, entities, 
-    camera_x, camera_y, view_width, view_height, 
-    visible_tiles, explored_tiles,
+
+def draw_map(
+    stdscr,
+    grid,
+    player_x,
+    player_y,
+    entities,
+    camera_x,
+    camera_y,
+    view_width,
+    view_height,
+    visible_tiles,
+    explored_tiles,
 ):
-    # Draw terrain grid first
+    # Draw only the current camera viewport.
     for screen_y in range(view_height):
         world_y = camera_y + screen_y
 
-    for screen_x in range(view_width):
-        world_x = camera_x + screen_x
+        for screen_x in range(view_width):
+            world_x = camera_x + screen_x
 
-        if world_y >= len(grid) or world_x >= len(grid[0]):
-            continue
+            # Defensive check in case viewport and map sizes differ.
+            if world_y >= len(grid) or world_x >= len(grid[0]):
+                continue
 
-        tile_id = grid[world_y][world_x]
-        props = TILE_DATA[tile_id]
+            # Never seen: leave the tile blank.
+            if not explored_tiles[world_y][world_x]:
+                safe_addch(stdscr, screen_y + 2, screen_x, " ")
+                continue
 
-        if not explored_tiles[world_y][world_x]:
-            stdscr.addstr(screen_y + 2, screen_x, " ")
-        
-        is_visible =  (world_x, world_y) in visible_tiles
+            tile_id = grid[world_y][world_x]
+            props = TILE_DATA[tile_id]
 
-        attr = curses.color_pair(props["color"])
-        if not is_visible:
-            attr |= curses.A_DIM
+            is_visible = (world_x, world_y) in visible_tiles
 
+            attr = curses.color_pair(props["color"])
 
-        safe_addch(
-            stdscr,
-            screen_y + 2,
-            screen_x,
-            props["char"],
-            attr,
-        )
+            # Previously explored tiles remain visible but dim.
+            if not is_visible:
+                attr |= curses.A_DIM
 
-    map_height = len(grid)
-    map_width = len(grid[0]) if grid else 0
+            # Floor is always slightly dimmer than special terrain.
+            if tile_id == FLOOR:
+                attr |= curses.A_DIM
 
-    # Draw entities
+            safe_addch(
+                stdscr,
+                screen_y + 2,
+                screen_x,
+                props["char"],
+                attr,
+            )
+
+    # Draw entities only if they are currently visible and on-screen.
     for entity in entities:
         if (entity["x"], entity["y"]) not in visible_tiles:
             continue
 
-    screen_x = entity["x"] - camera_x
-    screen_y = entity["y"] - camera_y
+        screen_x = entity["x"] - camera_x
+        screen_y = entity["y"] - camera_y
 
-    if 0 <= screen_x < view_width and 0 <= screen_y < view_height:
-        safe_addch(
-            stdscr,
-            screen_y + 2,
-            screen_x,
-            entity["char"],
-            curses.color_pair(entity["color"]),
-        )
+        if 0 <= screen_x < view_width and 0 <= screen_y < view_height:
+            safe_addch(
+                stdscr,
+                screen_y + 2,
+                screen_x,
+                entity["char"],
+                curses.color_pair(entity["color"]),
+            )
 
-
-    # Add player last
+    # Draw player last, ensuring the player appears over terrain/entities.
     player_screen_x = player_x - camera_x
     player_screen_y = player_y - camera_y
 
