@@ -98,7 +98,7 @@ def main(stdscr):
             stdscr.getch()
             continue
 
-        view_height = max_y - MAX_TOP - MESSAGE_LOG_HEIGHT
+        view_height = max_y - MAP_TOP - MESSAGE_LOG_HEIGHT
         view_width = max_x - 1
 
         camera_x, camera_y = get_camera(
