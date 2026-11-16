@@ -1,6 +1,12 @@
 import curses
 from tiles import TILE_DATA, FLOOR
 
+def safe_addch(stdscr, y, x, char, attr=0):
+    max_y, max_x = stdscr.getmaxyx()
+
+    if 0 <= y < max_y and 0 <= x < max_x - 1:
+        stdscr.addch(y, x, char, attr)
+
 def init_colors():
     curses.start_color()
     curses.use_default_colors()
@@ -38,7 +44,8 @@ def draw_map(stdscr, grid, player_x, player_y, entities,
             attr |= curses.A_DIM
 
 
-        stdscr.addstr(
+        safe_addch(
+            stdscr,
             screen_y + 2,
             screen_x,
             props["char"],
@@ -57,17 +64,24 @@ def draw_map(stdscr, grid, player_x, player_y, entities,
     screen_y = entity["y"] - camera_y
 
     if 0 <= screen_x < view_width and 0 <= screen_y < view_height:
-        stdscr.addstr(
+        safe_addch(
+            stdscr,
             screen_y + 2,
             screen_x,
             entity["char"],
             curses.color_pair(entity["color"]),
         )
 
+
     # Add player last
-    stdscr.addstr(
-        player_y + 2, 
-        player_x, 
-        "@", 
-        curses.color_pair(5) | curses.A_BOLD,
-    )
+    player_screen_x = player_x - camera_x
+    player_screen_y = player_y - camera_y
+
+    if 0 <= player_screen_x < view_width and 0 <= player_screen_y < view_height:
+        safe_addch(
+            stdscr,
+            player_screen_y + 2,
+            player_screen_x,
+            "@",
+            curses.color_pair(5) | curses.A_BOLD,
+        )
