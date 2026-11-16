@@ -13,6 +13,7 @@ WATER = "water"
 BRIDGE = "bridge"
 BANK = "bank"
 SHRINE = "shrine"
+CAMPFIRE = "campfire"
 
 SHRINE_TEXT = (
     "The shrine is older than any stonework you have seen in the nearby "
@@ -42,5 +43,17 @@ TILE_DATA = {
         "walkable": True,
         "enter_msg": "You discover an ancient shrine. Its stone is warm to the touch.",
         "text": SHRINE_TEXT,
+    },
+    CAMPFIRE: {
+        "char": "*",
+        "name": "Abandoned Camp",
+        "color": 4,
+        "walkable": True,
+        "enter_msg": "You find the remains of an abandoned camp.",
+        "text": (
+            "A ring of stones surrounds a cold fire pit. The ash has not "
+            "yet scattered, but the bedrolls and supplies are gone.\n\n"
+            "Whoever camped here left in a hurry."
+        ),
     },
 }
