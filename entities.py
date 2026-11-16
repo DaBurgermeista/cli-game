@@ -1,5 +1,3 @@
-import random
-
 # 1. Entity Templates
 ENTITY_DATA = {
     "wolf": {"name": "Timber Wolf", "char": "w", "color": 4, "hp": 3, "hostile": True},
