@@ -87,17 +87,6 @@ def carve_river(grid):
         step = drift * random.choice([1, 1, 2])
         rx = max(3, min(width - river_width - 3, rx + step))
 
-        """ Build a walkable bridge halfway across
-        if ry == bridge_y or ry == bridge_y + 1:
-            grid[ry][rx] = BRIDGE
-            if rx + 1 < width - 1:
-                grid[ry][rx + 1] = BRIDGE
-        else:
-            grid[ry][rx] = WATER
-            if rx + 1 < width - 1:
-                grid[ry][rx + 1] = WATER
-        """
-
 def stamp_forest_near_water(grid, scale=0.05):
     water_tiles = []
 
@@ -164,6 +153,22 @@ def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
             return True # Successfully places
     return False # Could not place
 
+def find_open_floor(grid, occupied=None):
+    if occupied is None:
+        occupied = set()
+
+    floor_tiles = []
+
+    for y in range(1, len(grid) - 1):
+        for x in range(1, len(grid[0] - 1)):
+            if grid[y][x] == FLOOR and (x, y) not in occupied:
+                floor_tiles.append((x, y))
+
+    if not floor_tiles:
+        raise RuntimeError("No open floor tiles are available.")
+
+    return random.choice(floor_tiles)
+
 def generate_overworld(map_width, map_height):
     room = create_overworld(map_width, map_height)
 
@@ -188,8 +193,6 @@ def generate_overworld(map_width, map_height):
     stamp_building(room, w=6, h=5, is_ruin=True)
     stamp_building(room, w=8, h=5, is_ruin=True)
 
-    player_x = map_width // 2
-    player_y = map_height // 2
-    room[player_y][player_x] == FLOOR
+    player_x, player_y = find_open_floor(room)
 
     return room, player_x, player_y
