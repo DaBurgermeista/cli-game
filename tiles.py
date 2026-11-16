@@ -25,5 +25,5 @@ TILE_DATA = {
     KEY:    {"char": "K", "name": "Key",        "color": 3, "walkable": True, "pickup": "key"},
     EXIT:   {"char": "E", "name": "Exit",       "color": 3, "walkable": True, "exit": True},
     BRIDGE: {"char": "=", "name": "Bridge",     "color": 3, "walkable": True,   "enter_msg": "Wooden planks creak beneath your boots."},
-    BANK:   {"char": ",", "name": "Riverbank",  "color": 3, "walkable": True,   "enter_msg": "Sof mud squishes along the riverbank."},
+    BANK:   {"char": ",", "name": "Riverbank",  "color": 3, "walkable": True,   "enter_msg": "Soft mud squishes along the riverbank."},
 }
