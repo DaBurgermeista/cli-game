@@ -199,6 +199,7 @@ def main(stdscr):
             show_text_panel(stdscr, props["name"], props["lore"])
 
         if props.get("exit"):
+            show_text_panel(stdscr, "Victory!", "Good Job! You found the super easy to get to exit!\n")
             break
 
 curses.wrapper(main)
