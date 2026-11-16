@@ -22,10 +22,24 @@ def draw_map(stdscr, grid, player_x, player_y, entities):
                 attr |= curses.A_DIM
             stdscr.addstr(y + 2, x, props["char"], attr)
 
+    map_height = len(grid)
+    map_width = len(grid[0]) if grid else 0
+
     # Draw all monsters
     for entity in entities:
-        attr = curses.color_pair(entity["color"])
-        stdscr.addstr(entity["y"] + 2, entity["x"], entity["char"], attr)
+        if 0 <= entity["x"] < map_width and 0 <= entity["y"] < map_height:
+            attr = curses.color_pair(entity["color"])
+            stdscr.addstr(
+                entity["y"] + 2, 
+                entity["x"], 
+                entity["char"], 
+                attr,
+            )
 
     # Add player last
-    stdscr.addstr(player_y + 2, player_x, "@", curses.color_pair(5) | curses.A_BOLD)
+    stdscr.addstr(
+        player_y + 2, 
+        player_x, 
+        "@", 
+        curses.color_pair(5) | curses.A_BOLD,
+    )
