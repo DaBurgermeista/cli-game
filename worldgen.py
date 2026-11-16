@@ -11,6 +11,7 @@ from tiles import (
     BANK,
     SHRINE,
     ROCK,
+    CAMPFIRE,
 )
 
 def create_overworld(width, height):
@@ -193,6 +194,45 @@ def stamp_shrine(grid):
 
     return None
 
+def stamp_abandoned_camp(grid):
+    height = len(grid)
+    width = len(grid[0])
+
+    # The camp occupies a 5x5 area.
+    for _ in range(50):
+        center_x = random.randint(3, width - 4)
+        center_y = random.randint(3, height - 4)
+
+        # Only place camps in clear ordinary floor terrain.
+        spot_clear = True
+
+        for y in range(center_y - 2, center_y + 3):
+            for x in range(center_x - 2, center_x + 3):
+                if grid[y][x] != FLOOR:
+                    spot_clear = False
+                    break
+
+            if not spot_clear:
+                break
+
+        if not spot_clear:
+            continue
+
+        # Campfire at the center.
+        grid[center_y][center_x] = CAMPFIRE
+
+        # A rough ring of stones around the fire.
+        grid[center_y + 1][center_x] = ROCK
+        grid[center_y][center_x - 1] = ROCK
+        grid[center_y][center_x + 1] = ROCK
+
+        return {
+            "kind": "abandoned_camp",
+            "x": center_x,
+            "y": center_y,
+        }
+
+    return None
 
 def find_open_floor(grid, occupied=None):
     if occupied is None:
@@ -253,9 +293,13 @@ def generate_overworld(map_width, map_height):
     stamp_building(room, w=8, h=5, is_ruin=True)
 
     shrine = stamp_shrine(room)
+    camp = stamp_abandoned_camp(room)
 
     if shrine is None:
         raise RuntimeError("Could not place shrine.")
+
+    if camp is None:
+        raise RuntimeError("Could not place abandoned camp.")
 
     player_x, player_y = find_open_floor(room)
 
