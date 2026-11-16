@@ -164,7 +164,7 @@ def main(stdscr):
         
         if key == ord("f"):
             debug_reveal_map = not debug_reveal_map
-            add_message((
+            add_message(messages, (
                 "Debug map reveal enabled."
                 if debug_reveal_map
                 else "Debug map reveal disabled."
