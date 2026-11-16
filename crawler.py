@@ -196,7 +196,7 @@ def main(stdscr):
                 break
         
         if "lore" in props:
-            show_show_text_panel(stdscr, props["name"], props["lore"])
+            show_text_panel(stdscr, props["name"], props["lore"])
 
         if props.get("exit"):
             break
