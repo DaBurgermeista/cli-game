@@ -1,7 +1,7 @@
 import curses
 
 from entities import create_entity, get_entity_at
-from render import draw_map, init_colors
+from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA
 from worldgen import generate_overworld, find_open_floor
 from vision import get_visible_tiles
@@ -9,6 +9,10 @@ from ui import show_text_panel
 
 WORLD_WIDTH = 100
 WORLD_HEIGHT = 60
+
+MAP_TOP = 2
+MESSAGE_LOG_HEIGHT = 5
+MAX_MESSAGES = MESSAGE_LOG_HEIGHT - 1
 
 INTRO_TITLE = "The Quiet River"
 INTRO_TEXT = (
@@ -18,6 +22,15 @@ INTRO_TEXT = (
     "and old shrines standing where no shrine should be.\n\n"
     "You came to see what the land is becoming."
 )
+
+def add_message(messages, text):
+    if not text:
+        return
+
+    messages.append(text)
+
+    if len(messages) > MAX_MESSAGES:
+        messages.pop(0)
 
 def can_enter(tile_char, has_key):
     props = TILE_DATA[tile_char]
@@ -62,7 +75,9 @@ def main(stdscr):
 
     health = 3
     has_key = False
-    message = "Explore the map!"   
+    messages = [
+        "Explore the wilderness.",
+    ]   
 
     entities = [
         create_entity("wolf", wolf_x, wolf_y),
@@ -76,14 +91,14 @@ def main(stdscr):
 
         max_y, max_x = stdscr.getmaxyx()
     
-        if max_y < 10 or max_x < 20:
+        if max_y < 14 or max_x < 30:
             stdscr.erase()
             stdscr.addstr(0, 0, "Terminal too small. Resize it to continue.")
             stdscr.refresh()
             stdscr.getch()
             continue
 
-        view_height = max_y - 4
+        view_height = max_y - MAX_TOP - MESSAGE_LOG_HEIGHT
         view_width = max_x - 1
 
         camera_x, camera_y = get_camera(
@@ -130,27 +145,30 @@ def main(stdscr):
             explored_tiles,
         )
 
-        message_y = max_y - 1
+        log_y = MAP_TOP + view_height
 
-        stdscr.move(message_y, 0)
-        stdscr.clrtoeol()
-        stdscr.addnstr(message_y, 0, message, max_x - 1)
+        draw_message_log(
+            stdscr,
+            messages,
+            log_y,
+            max_x,
+            MESSAGE_LOG_HEIGHT,
+        )
 
         stdscr.refresh()
 
         key = stdscr.getch()
-        message = ""
 
         if key == ord("q"):
             break        
         
         if key == ord("f"):
             debug_reveal_map = not debug_reveal_map
-            message = (
+            add_message((
                 "Debug map reveal enabled."
                 if debug_reveal_map
                 else "Debug map reveal disabled."
-            )
+            ))
             continue
 
         next_x, next_y = player_x, player_y
@@ -167,7 +185,7 @@ def main(stdscr):
         # 3. Movement System checks TILE_DATA
         if (next_x, next_y) != (player_x, player_y):
             if not (0 <= next_y < len(room) and 0 <= next_x < len(room[0])):
-                message = "You cannot go that way."
+                add_message(messages, "You cannot go that way.")
                 continue
 
             target_tile = room[next_y][next_x]
@@ -175,16 +193,17 @@ def main(stdscr):
             target_entity = get_entity_at(entities, next_x, next_y)
 
             if target_entity is not None:
-                message = f"A {target_entity['name']} blocks your path!"
+                add_message(messages, f"A {target_entity['name']} blocks your path!")
 
             elif can_enter(target_tile, has_key):
                 player_x, player_y = next_x, next_y
                 message = target_props.get("enter_msg", "")
 
             else:
-                message = target_props.get(
-                    "bump_msg",
-                    "Something blocks your way.",
+                add_message(target_props.get(
+                        "bump_msg",
+                        "Something blocks your way.",
+                    ),
                 )
 
         # 4. Interaction System reads flags from TILE_DATA
@@ -192,17 +211,17 @@ def main(stdscr):
         props = TILE_DATA[current_tile]
         
         if props.get("pickup")  == "key":
-            message = "You found a key"
+            add_message(messages, "You found a key.")
             has_key = True
             room[player_y][player_x] = FLOOR
         
         if props.get("need_key"):
             room[player_y][player_x] = FLOOR
-            message = "You unlocked the door!"
+            add_message(messages, "You unlocked the door!")
         
         if "damage" in props:
             health = max(0, health - props["damage"])
-            message = f"Ouch! You took {props['damage']} damage! from a {props['name']}!"
+            add_message(messages, f"Ouch! You took {props['damage']} damage! from a {props['name']}!")
             if health <= 0:
                 break
         

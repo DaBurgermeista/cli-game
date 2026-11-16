@@ -22,6 +22,34 @@ def init_colors():
     curses.init_pair(5, curses.COLOR_CYAN, -1)
     curses.init_pair(6, curses.COLOR_BLUE, -1)
 
+def draw_message_log(stdscr, messages, start_y, width, height):
+    # Clear every row belonging to the message area. 
+    for row in range(height):
+        stdscr.move(start_y + row, 0)
+        stdscr.clrtoeol()
+
+    # Draw a divider above the messages
+    stdscr.addnstr(
+        start_y,
+        0,
+        "-" * (width - 1),
+        width - 1,
+        curses.A_DIM,
+    )
+
+    available_rows = height - 1
+
+    recent_messages = messages[-available_rows:]
+
+    first_message_y = start_y + 1 + (available_rows - len(recent_messages))
+
+    for index, text in enumerate(recent_messages):
+        stdscr.addnstr(
+            first_message_y + index,
+            0,
+            text,
+            width - 1,
+        )
 
 def draw_map(
     stdscr,
