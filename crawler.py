@@ -76,6 +76,10 @@ def main(stdscr):
 
         # 3. Movement System checks TILE_DATA
         if (next_x, next_y) != (player_x, player_y):
+            if not (0 <= next_y < len(room) and 0 <= next_x < len(room[0])):
+                message("You cannot go that way.")
+                continue
+                
             target_tile = room[next_y][next_x]
             target_props = TILE_DATA[target_tile]
             target_entity = get_entity_at(entities, next_x, next_y)
