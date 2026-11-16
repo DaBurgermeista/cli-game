@@ -25,7 +25,7 @@ def main(stdscr):
     occupied = {(player_x, player_y)}
 
     wolf_x, wolf_y = find_open_floor(room, occupied)
-    occupied.add((wold_x, wolf_y))
+    occupied.add((wolf_x, wolf_y))
 
     deer_x, deer_y = find_open_floor(room, occupied)
     occupied.add((deer_x, deer_y))
