@@ -28,7 +28,7 @@ def draw_map(stdscr, grid, player_x, player_y, entities,
         tile_id = grid[world_y][world_x]
         props = TILE_DATA[tile_id]
 
-        if not explored_tiles[world_y, world_x]:
+        if not explored_tiles[world_y][world_x]:
             stdscr.addstr(screen_y + 2, screen_x, " ")
         
         is_visible =  (world_x, world_y) in visible_tiles
