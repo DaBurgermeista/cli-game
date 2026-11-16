@@ -5,6 +5,7 @@ Early Python/curses exploration-game prototype.
 ## Controls
 
 - `W`, `A`, `S`, `D` or arrow keys: move
+- `F`: toggle full-map debug reveal
 - `Q`: quit
 
 ## Current features

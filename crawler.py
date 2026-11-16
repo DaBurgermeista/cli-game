@@ -31,6 +31,7 @@ def main(stdscr):
     # Hide the blinking terminal cursor
     curses.curs_set(0)  
     init_colors()
+    debug_reveal_map = False
 
     room, player_x, player_y = generate_overworld(WORLD_WIDTH, WORLD_HEIGHT)
 
@@ -89,6 +90,14 @@ def main(stdscr):
         stdscr.addnstr(0, 0, hud, max_x - 1)
         
         visible_tiles = get_visible_tiles(room, player_x, player_y, radius=8)
+
+        if debug_reveal_map:
+            visible_tiles = {
+                (x, y)
+                for y in range(len(room))
+                for x in range(len(room[0]))
+            }
+
         for x, y in visible_tiles:
             explored_tiles[y][x] = True
 
@@ -120,6 +129,15 @@ def main(stdscr):
         if key == ord("q"):
             break        
         
+        if key == ord("f"):
+            debug_reveal_map = not debug_reveal_map
+            message = (
+                "Debug map reveal enabled."
+                if debug_reveal_map
+                else "Debug map reveal disabled."
+            )
+            continue
+
         next_x, next_y = player_x, player_y
 
         if key in (ord("w"), curses.KEY_UP):
