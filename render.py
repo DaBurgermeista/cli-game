@@ -28,4 +28,4 @@ def draw_map(stdscr, grid, player_x, player_y, entities):
         stdscr.addstr(entity["y"] + 2, entity["x"], entity["char"], attr)
 
     # Add player last
-    stdscr.addstr(player_y + 2, player_x, "@", curses.color_pair(5))
+    stdscr.addstr(player_y + 2, player_x, "@", curses.color_pair(5) | curses.A_BOLD)
