@@ -12,12 +12,11 @@ WORLD_HEIGHT = 60
 
 INTRO_TITLE = "The Quiet River"
 INTRO_TEXT = (
-    "For three days, you have followed the river north.\n\n"
-    "The water runs cold, but the banks are warm beneath your boots. "
-    "No birds call from the trees, and every trail seems to lead deeper "
-    "into the forest.\n\n"
-    "The last settlement spoke of old shrines waking in the wilds. "
-    "You came to see whether the stories were true."
+    "You have entered a wilderness few travelers cross willingly.\n\n"
+    "Somewhere beyond these woods, the Quiet River has changed its course. "
+    "Settlements on its banks speak of unfamiliar ruins, abandoned camps, "
+    "and old shrines standing where no shrine should be.\n\n"
+    "You came to see what the land is becoming."
 )
 
 def can_enter(tile_char, has_key):
