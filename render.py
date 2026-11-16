@@ -16,7 +16,7 @@ def draw_map(stdscr, grid, player_x, player_y, entities):
     for y, row in enumerate(grid):
         for x, tile_id in enumerate(row):
             props = TILE_DATA[tile_id]
-            color_id = TILE_DATA[tile_id]["color"]
+            color_id = props["color"]
             attr = curses.color_pair(color_id)
             if tile_id == FLOOR:
                 attr |= curses.A_DIM
