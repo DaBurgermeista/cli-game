@@ -12,6 +12,7 @@ from tiles import (
     SHRINE,
     ROCK,
     CAMPFIRE,
+    TALL_GRASS,
 )
 
 def create_overworld(width, height):
@@ -27,7 +28,7 @@ def create_overworld(width, height):
 
     return grid
 
-def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04):
+def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04, replaceable_tiles=(FLOOR, BANK)):
     height = len(grid)
     width = len(grid[0])
 
@@ -38,7 +39,7 @@ def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04):
 
     for _ in range(steps):
         if 2 < fx < width - 3 and 2 < fy < height - 3:
-            if grid[fy][fx] in (FLOOR, BANK):
+            if grid[fy][fx] in replaceable_tiles:
                 grid[fy][fx] = tile_type
         
         dx, dy = random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
@@ -266,7 +267,20 @@ def generate_overworld(map_width, map_height):
     # Put forests in by water
     for _ in range(4):
         stamp_forest_near_water(room, scale=0.05)
-        
+
+    # Add open-field texture
+    for _ in range(8):
+        grass_x = random.randint(4, map_width - 5)
+        grass_y = random.randint(4, map_height - 5)
+
+        stamp_blob(
+            room,
+            grass_x,
+            grass_y,
+            TALL_GRASS,
+            scale=0.03,
+            replaceable_tiles=(FLOOR,),
+        )
 
     key_placed = stamp_building(
         room, 
