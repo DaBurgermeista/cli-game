@@ -12,6 +12,7 @@ ROCK = "rock"
 WATER = "water"
 BRIDGE = "bridge"
 BANK = "bank"
+SHRINE = "shrine"
 
 TILE_DATA = {
     FLOOR:  {"char": ".", "name": "Floor",      "color": 1, "walkable": True, "blocks_sight": False},
@@ -25,4 +26,11 @@ TILE_DATA = {
     EXIT:   {"char": "E", "name": "Exit",       "color": 3, "walkable": True, "exit": True},
     BRIDGE: {"char": "=", "name": "Bridge",     "color": 3, "walkable": True,   "enter_msg": "Wooden planks creak beneath your boots."},
     BANK:   {"char": ",", "name": "Riverbank",  "color": 3, "walkable": True,   "enter_msg": "Soft mud squishes along the riverbank."},
+    SHRINE: {
+        "char": "A",
+        "name": "Ancient Shrine",
+        "color": 5,
+        "walkable": True,
+        "enter_msg": "You discover an ancient shrine. Its stone is warm to the touch."
+    },
 }
