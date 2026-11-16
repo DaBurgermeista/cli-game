@@ -1,23 +1,9 @@
 import curses
-from tiles import TILE_DATA, FLOOR, KEY, EXIT, PLAYER
-from worldgen import (
-    create_overworld,
-    carve_river,
-    stamp_blob,
-    stamp_forest_near_water,
-    stamp_building,
-    generate_overworld
-)
-from render import init_colors, draw_map
-from entities import create_entity, get_entity_at
 
-MAP_WIDTH = 50
-MAP_HEIGHT = 22
-MIN_ROOM_WIDTH = 4
-MAX_ROOM_WIDTH = 6
-MIN_ROOM_HEIGHT = 3
-MAX_ROOM_HEIGHT = 5
-# ---
+from entities import create_entity, get_entity_at
+from render import draw_map, init_colors
+from tiles import FLOOR, TILE_DATA
+from worldgen import generate_overworld
 
 def can_enter(tile_char, has_key):
     props = TILE_DATA[tile_char]
@@ -79,7 +65,7 @@ def main(stdscr):
             if not (0 <= next_y < len(room) and 0 <= next_x < len(room[0])):
                 message("You cannot go that way.")
                 continue
-                
+
             target_tile = room[next_y][next_x]
             target_props = TILE_DATA[target_tile]
             target_entity = get_entity_at(entities, next_x, next_y)
