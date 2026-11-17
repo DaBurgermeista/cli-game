@@ -25,12 +25,13 @@ def raise_hill(elevation, center_x, center_y, radius, peak_height):
 
     for y in range(max(0, center_y - radius), min(height, center_y + radius + 1)):
         for x in range(max(0, center_x - radius), min(width, center_x + radius + 1)):
-            distance = abs(x - center_x) + abs(y - center_y)
+            distance_squared = (x - center_x) ** 2 + (y - center_y) ** 2
 
-            if distance > radius:
+            if distance_squared > radius ** 2:
                 continue
 
             height_range = peak_height - BASE_ELEVATION
+            distance = int(distance_squared ** 0.5)
             height_loss = (distance * height_range) // radius
             tile_height = peak_height - height_loss
 
@@ -42,13 +43,29 @@ def create_elevation_map(width, height):
         for _ in range(height)
     ]
 
-    # Create a few large high-ground regions.
+    # Broad rolling hills. These shape terrain but do not create mountains.
+    for _ in range(8):
+        center_x = random.randint(width // 8, width - (width // 8) - 1)
+        center_y = random.randint(height // 8, height - (height // 8) - 1)
+
+        radius = random.randint(8, 16)
+        peak_height = random.randint(5, 7)
+
+        raise_hill(
+            elevation,
+            center_x,
+            center_y,
+            radius,
+            peak_height,
+        )
+
+    # Smaller number of high mountain regions.
     for _ in range(3):
         center_x = random.randint(width // 6, width - (width // 6) - 1)
         center_y = random.randint(height // 6, height - (height // 6) - 1)
 
         radius = random.randint(6, 12)
-        peak_height = random.randint(7, MAX_ELEVATION)
+        peak_height = random.randint(8, MAX_ELEVATION)
 
         raise_hill(
             elevation,
