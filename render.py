@@ -94,8 +94,10 @@ def draw_map(
                 safe_addch(stdscr, screen_y + 2, screen_x, " ")
                 continue
 
-            # In normal play, unexplored tiles remain blank.
-            if not show_elevation and not explored_tiles[world_y][world_x]:
+            is_visible = (world_x, world_y) in visible_tiles
+
+            # Hide a tile only when it has never been explored AND is not currently displayed.
+            if not show_elevation and not explored_tiles[world_y][world_x] and not is_visible:
                 safe_addch(stdscr, screen_y + 2, screen_x, " ")
                 continue
 
