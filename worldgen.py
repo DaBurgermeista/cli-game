@@ -13,7 +13,62 @@ from tiles import (
     ROCK,
     CAMPFIRE,
     TALL_GRASS,
+    MOUNTAIN,
 )
+
+BASE_ELEVATION = 3
+MAX_ELEVATION = 9
+
+def raise_hill(elevation, center_x, center_y, radius, peak_height):
+    height = len(elevation)
+    width = len(elevation[0])
+
+    for y in range(max(0, center_y - radius), min(height, center_y + radius + 1)):
+        for x in range(max(0, center_x - radius), min(width, center_x + radius + 1)):
+            distance = abs(x - center_x) + abs(y - center_y)
+
+            if distance > radius:
+                continue
+
+            height_range = peak_height - BASE_ELEVATION
+            height_loss = (distance * height_range) // radius
+            tile_height = peak_height - height_loss
+
+            elevation[y][x] = max(elevation[y][x], tile_height)
+
+def create_elevation_map(width, height):
+    elevation = [
+        [BASE_ELEVATION for _ in range(width)]
+        for _ in range(height)
+    ]
+
+    # Create a few large high-ground regions.
+    for _ in range(3):
+        center_x = random.randint(width // 6, width - (width // 6) - 1)
+        center_y = random.randint(height // 6, height - (height // 6) - 1)
+
+        radius = random.randint(6, 12)
+        peak_height = random.randint(7, MAX_ELEVATION)
+
+        raise_hill(
+            elevation,
+            center_x,
+            center_y,
+            radius,
+            peak_height,
+        )
+
+    return elevation
+
+def apply_mountains(grid, elevation, mountain_height=8):
+    height = len(grid)
+    width = len(grid[0])
+
+    for y in range(1, height - 1):
+        for x in range(1, width - 1):
+            # Only high elevation floors become mountains
+            if elevation[y][x] >= mountain_height and grid[y][x] == FLOOR:
+                grid[y][x] = MOUNTAIN
 
 def create_overworld(width, height):
     grid = [[FLOOR for _ in range(width)] for _ in range(height)]
@@ -252,6 +307,7 @@ def find_open_floor(grid, occupied=None):
     return random.choice(floor_tiles)
 
 def generate_overworld(map_width, map_height):
+    elevation = create_elevation_map(map_width, map_height)
     room = create_overworld(map_width, map_height)
 
     # Generate Water Features first
@@ -263,6 +319,8 @@ def generate_overworld(map_width, map_height):
         lake_x = random.randint(5, map_width - 6)
         lake_y = random.randint(4, map_height - 5)
         stamp_blob(room, lake_x, lake_y, WATER, scale=0.04)
+
+    apply_mountains(room, elevation)
 
     # Put forests in by water
     for _ in range(4):
@@ -317,4 +375,4 @@ def generate_overworld(map_width, map_height):
 
     player_x, player_y = find_open_floor(room)
 
-    return room, player_x, player_y
+    return room, elevation, player_x, player_y

@@ -51,6 +51,18 @@ def draw_message_log(stdscr, messages, start_y, width, height):
             width - 1,
         )
 
+def get_elevation_attr(value):
+    if value <= 4:
+        return curses.color_pair(2)  # Green: lowland / normal ground
+
+    if value <= 6:
+        return curses.color_pair(3)  # Yellow: hills
+
+    if value <= 7:
+        return curses.color_pair(4)  # Red: high hills
+
+    return curses.color_pair(1)      # White: mountain peaks
+
 def draw_map(
     stdscr,
     grid,
@@ -63,6 +75,8 @@ def draw_map(
     view_height,
     visible_tiles,
     explored_tiles,
+    elevation=None,
+    show_elevation=False,
 ):
     # Draw only the current camera viewport.
     for screen_y in range(view_height):
@@ -75,15 +89,29 @@ def draw_map(
             if world_y >= len(grid) or world_x >= len(grid[0]):
                 continue
 
-            # Never seen: leave the tile blank.
-            if not explored_tiles[world_y][world_x]:
+            is_visible = (world_x, world_y) in visible_tiles
+
+            # Hide a tile only when it has never been explored AND is not currently displayed.
+            if not show_elevation and not explored_tiles[world_y][world_x] and not is_visible:
                 safe_addch(stdscr, screen_y + 2, screen_x, " ")
+                continue
+
+            # Elevation debug mode replaces terrain with elevation digits.
+            if show_elevation and elevation is not None:
+                elevation_value = elevation[world_y][world_x]
+
+                safe_addch(
+                    stdscr,
+                    screen_y + 2,
+                    screen_x,
+                    str(elevation_value),
+                    get_elevation_attr(elevation_value),
+                )
+
                 continue
 
             tile_id = grid[world_y][world_x]
             props = TILE_DATA[tile_id]
-
-            is_visible = (world_x, world_y) in visible_tiles
 
             attr = curses.color_pair(props["color"])
 
@@ -104,21 +132,22 @@ def draw_map(
             )
 
     # Draw entities only if they are currently visible and on-screen.
-    for entity in entities:
-        if (entity["x"], entity["y"]) not in visible_tiles:
-            continue
+    if not show_elevation:
+        for entity in entities:
+            if (entity["x"], entity["y"]) not in visible_tiles:
+                continue
 
-        screen_x = entity["x"] - camera_x
-        screen_y = entity["y"] - camera_y
+            screen_x = entity["x"] - camera_x
+            screen_y = entity["y"] - camera_y
 
-        if 0 <= screen_x < view_width and 0 <= screen_y < view_height:
-            safe_addch(
-                stdscr,
-                screen_y + 2,
-                screen_x,
-                entity["char"],
-                curses.color_pair(entity["color"]),
-            )
+            if 0 <= screen_x < view_width and 0 <= screen_y < view_height:
+                safe_addch(
+                    stdscr,
+                    screen_y + 2,
+                    screen_x,
+                    entity["char"],
+                    curses.color_pair(entity["color"]),
+                )
 
     # Draw player last, ensuring the player appears over terrain/entities.
     player_screen_x = player_x - camera_x

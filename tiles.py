@@ -15,6 +15,7 @@ BRIDGE = "bridge"
 BANK = "bank"
 SHRINE = "shrine"
 CAMPFIRE = "campfire"
+MOUNTAIN = "mountain"
 
 SHRINE_TEXT = (
     "The shrine is older than any stonework you have seen in the nearby "
@@ -72,6 +73,14 @@ TILE_DATA = {
         "walkable": False,
         "blocks_sight": False,
         "bump_msg": "The river current is too deep to cross.",
+    },
+    MOUNTAIN: {
+        "char": "M",
+        "name": "Mountain",
+        "color": 1,
+        "walkable": False,
+        "blocks_sight": True,
+        "bump_msg": "Steep mountains block your path.",
     },
     SPIKE: {
         "char": "^",
