@@ -6,6 +6,7 @@ Early Python/curses exploration-game prototype.
 
 - `W`, `A`, `S`, `D` or arrow keys: move
 - `F`: toggle full-map debug reveal
+- `E`: toggle heigh-map debug for elevation
 - `Q`: quit
 
 ## Current features
