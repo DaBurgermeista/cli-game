@@ -118,8 +118,6 @@ def draw_map(
             tile_id = grid[world_y][world_x]
             props = TILE_DATA[tile_id]
 
-            is_visible = (world_x, world_y) in visible_tiles
-
             attr = curses.color_pair(props["color"])
 
             # Previously explored tiles remain visible but dim.
