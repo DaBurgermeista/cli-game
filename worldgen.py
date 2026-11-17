@@ -13,6 +13,7 @@ from tiles import (
     ROCK,
     CAMPFIRE,
     TALL_GRASS,
+    MOUNTAIN,
 )
 
 BASE_ELEVATION = 3
@@ -58,6 +59,16 @@ def create_elevation_map(width, height):
         )
 
     return elevation
+
+def apply_mountains(grid, elevation, mountain_height=8):
+    height = len(grid)
+    width = len(grid[0])
+
+    for y in range(1, height - 1):
+        for x in range(1, width - 1):
+            # Only high elevation floors become mountains
+            if elevation[y][x] >= mountain_height and grid[y][x] == FLOOR:
+                grid[y][x] = MOUNTAIN
 
 def create_overworld(width, height):
     grid = [[FLOOR for _ in range(width)] for _ in range(height)]
@@ -308,6 +319,8 @@ def generate_overworld(map_width, map_height):
         lake_x = random.randint(5, map_width - 6)
         lake_y = random.randint(4, map_height - 5)
         stamp_blob(room, lake_x, lake_y, WATER, scale=0.04)
+
+    apply_mountains(room, elevation)
 
     # Put forests in by water
     for _ in range(4):
