@@ -44,7 +44,7 @@ def create_elevation_map(width, height):
     ]
 
     # Broad rolling hills. These shape terrain but do not create mountains.
-    for _ in range(8):
+    for _ in range(5):
         center_x = random.randint(width // 8, width - (width // 8) - 1)
         center_y = random.randint(height // 8, height - (height // 8) - 1)
 
