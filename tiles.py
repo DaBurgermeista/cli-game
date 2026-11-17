@@ -84,12 +84,12 @@ TILE_DATA = {
         "bump_msg": "Steep mountains block your path.",
     },
     HILL: {
-        "char": "h",
+        "char": "^",
         "name": "Hill",
-        "color": 1,
+        "color": 3,
         "walkable": True,
         "blocks_sight": True,
-        "enter_msg": "You traverse steep hils.",
+        "enter_msg": "You climb into rolling hills.",
     },
     SPIKE: {
         "char": "^",
