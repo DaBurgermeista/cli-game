@@ -89,11 +89,6 @@ def draw_map(
             if world_y >= len(grid) or world_x >= len(grid[0]):
                 continue
 
-            # Never seen: leave the tile blank.
-            if not explored_tiles[world_y][world_x]:
-                safe_addch(stdscr, screen_y + 2, screen_x, " ")
-                continue
-
             is_visible = (world_x, world_y) in visible_tiles
 
             # Hide a tile only when it has never been explored AND is not currently displayed.
