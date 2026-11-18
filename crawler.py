@@ -220,13 +220,13 @@ def main(stdscr):
 
         if key == ord("i"):
             if not player_inventory:
-                inv_text = "Your pack is empty."
+                show_text_panel(stdscr, "Inventory", "Your pack is empty.")
             else:
-                inv_text = "\n".join(
+                inv_text = [
                     f"{idx + 1}. {item['name']}"
                     for idx, item in enumerate(player_inventory)
-                )
-            show_inventory_panel(stdscr, "Inventory", inv_text)
+                ]
+                choice = show_inventory_panel(stdscr, "Inventory", inv_text)
 
         next_x, next_y = player_x, player_y
 
