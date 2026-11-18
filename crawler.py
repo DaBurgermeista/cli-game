@@ -77,8 +77,11 @@ def main(stdscr):
     item_tiles = get_walkable_tiles(room, exclude=occupied_by_entities)
     items = spawn_random_items(room, biomes, item_tiles, count=12)
 
+    # Temp spot for player info
     health = 3
     has_key = False
+    inventory = []
+
     messages = [
         "Explore the wilderness.",
     ]   
@@ -205,6 +208,15 @@ def main(stdscr):
                 add_message(messages, "Elevation debug view disabled.")
 
             continue
+
+        if key == ord("g"):
+            item = get_item_at(items, player_x, player_y)
+            if item is not None:
+                player_inventory.append(item)
+                add_message(messages,f"You pick up the {item['name']}.")
+            else:
+                add_message(messages, "There is nothing here to pick up.")
+
         next_x, next_y = player_x, player_y
 
         if key in (ord("w"), curses.KEY_UP):
