@@ -1,6 +1,7 @@
 import curses
 
 from entities import create_entity, get_entity_at, spawn_random_entities
+from items import spawn_random_items, get_items_at
 from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld, find_open_floor
@@ -71,6 +72,9 @@ def main(stdscr):
 
     walkable_tiles = get_walkable_tiles(room, exclude={(player_x, player_y)})
     entities = spawn_random_entities(room, biomes, walkable_tiles, count=15)
+    occupied_by_entities = {(player_x, player_y)} | {(e["x"], e["y"]) for e in entities}
+    item_tiles = get_walkable_tiles(room, exclude=occupied_by_entities)
+    items = spawn_random_items(room, biomes, item_tiles, count=12)
 
     health = 3
     has_key = False
