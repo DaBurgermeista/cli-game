@@ -1,6 +1,6 @@
 {
     "wolf": {
-        "name": "Timer Wolf",
+        "name": "Timber Wolf",
         "char": "w",
         "color": 4,
         "hp": 3,
@@ -15,7 +15,7 @@
         "hp": 2,
         "hostile": false,
         "spawn_weight": 8,
-        "biomes": ["forest", "plains", "meadows"]
+        "biomes": ["forest", "plains", "meadow"]
     },
     "troll": {
         "name": "Cave Troll",
@@ -34,5 +34,50 @@
         "hostile": false,
         "spawn_weight": 3,
         "biomes": ["riverbank", "water"]
+    },
+    "boar": {
+        "name": "Wild Boar",
+        "char": "B",
+        "color": 3,
+        "hp": 4,
+        "hostile": true,
+        "spawn_weight": 4,
+        "biomes": ["forest", "meadow"]
+    },
+    "bandit": {
+        "name": "Scavenger",
+        "char": "s",
+        "color": 4,
+        "hp": 4,
+        "hostile": true,
+        "spawn_weight": 3,
+        "biomes": ["camp", "ruins", "plains"]
+    },
+    "snake": {
+        "name": "River Viper",
+        "char": "v",
+        "color": 2,
+        "hp": 2,
+        "hostile": true,
+        "spawn_weight": 4,
+        "biomes": ["riverbank", "water", "meadow"]
+    },
+    "goat": {
+        "name": "Crag Goat",
+        "char": "g",
+        "color": 3,
+        "hp": 2,
+        "hostile": false,
+        "spawn_weight": 6,
+        "biomes": ["highlands"]
+    },
+    "wisp": {
+        "name": "Forest Wisp",
+        "char": "*",
+        "color": 5,
+        "hp": 2,
+        "hostile": false,
+        "spawn_weight": 2,
+        "biomes": ["shrine", "forest"]
     }
 }
