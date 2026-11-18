@@ -250,7 +250,7 @@ def main(stdscr):
             if target_entity is not None:
                 add_message(messages, f"A {target_entity['name']} blocks your path!")
 
-            elif can_enter(target_tile, has_key):
+            elif can_enter(target_tile, player['has_key']):
                 player_x, player_y = next_x, next_y
                 add_message(messages, target_props.get("enter_msg", ""))
 
