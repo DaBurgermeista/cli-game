@@ -72,6 +72,7 @@ def main(stdscr):
 
     walkable_tiles = get_walkable_tiles(room, exclude={(player_x, player_y)})
     entities = spawn_random_entities(room, biomes, walkable_tiles, count=15)
+
     occupied_by_entities = {(player_x, player_y)} | {(e["x"], e["y"]) for e in entities}
     item_tiles = get_walkable_tiles(room, exclude=occupied_by_entities)
     items = spawn_random_items(room, biomes, item_tiles, count=12)
@@ -159,6 +160,7 @@ def main(stdscr):
             player_x,
             player_y,
             entities,
+            items,
             camera_x,
             camera_y,
             view_width,

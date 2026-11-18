@@ -69,6 +69,7 @@ def draw_map(
     player_x,
     player_y,
     entities,
+    items,
     camera_x,
     camera_y,
     view_width,
@@ -130,9 +131,25 @@ def draw_map(
                 props["char"],
                 attr,
             )
-
-    # Draw entities only if they are currently visible and on-screen.
+    
+    # Draw entities and items only if they are currently visible and on-screen.
     if not show_elevation:
+        for item in items:
+            if (entity["x"], entity["y"]) not in visible_tiles:
+                continue
+
+            screen_x = entity["x"] - camera_x
+            screen_y = entity["y"] - camera_y
+
+            if 0 <= screen_x < view_width and 0 <= screen_y < view_height:
+                safe_addch(
+                    stdscr,
+                    screen_y + 2,
+                    screen_x,
+                    entity["char"],
+                    curses.color_pair(entity["color"]),
+                )
+                
         for entity in entities:
             if (entity["x"], entity["y"]) not in visible_tiles:
                 continue
