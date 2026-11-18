@@ -28,15 +28,28 @@ def get_entity_at(entities, x, y):
             return entity
     return None
 
-def spawn_random_entities(world_map, walkable_tiles, count=15):
+def spawn_random_entities(world_map, biomes, walkable_tiles, count=15):
     entities = []
-    kinds = list(ENTITY_DATA.keys())
-    weights = [ENTITY_DATA[k].get("spawn_weight", 1) for k in kinds]
+    candidates = list(walkable_tiles)
+    random.shuffle(candidates)
 
-    chosen_tiles = random.sample(walkable_tiles, min(count, len(walkable_tiles)))
+    for x, y in candidates:
+        if len(entities) >= count:
+            break
+        
+        tile_biome = biomes[y][x]
 
-    for x, y in chosen_tiles:
-        kind = random.choices(kinds, weights=weights, k=1)[0]
-        entities.append(create_entity(kind, x, y))
+        valid_kinds = [
+            kind for kind, data in ENTITY_DATA.items()
+            if tile_biome in data.get("biomes", [])
+        ]
+
+        if not valid_kinds:
+            continue
+
+        weights = [ENTITY_DATA[k].get("spawn_weight", 1) for k in valid_kinds]
+        chosen_kind = random.choices(valid_kinds, weights=weights, k=1)[0]
+
+        entities.append(create_entity(chosen_kind, x, y))
     
     return entities
