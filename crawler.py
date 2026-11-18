@@ -70,7 +70,7 @@ def main(stdscr):
     ]
 
     walkable_tiles = get_walkable_tiles(room, exclude={(player_x, player_y)})
-    entities = spawn_random_entities(room, biomes walkable_tiles, count=15)
+    entities = spawn_random_entities(room, biomes, walkable_tiles, count=15)
 
     health = 3
     has_key = False
