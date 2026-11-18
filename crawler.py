@@ -279,7 +279,7 @@ def main(stdscr):
             add_message(messages, "You unlocked the door!")
         
         if "damage" in props:
-            player["hp"] = max(0, health - props["damage"])
+            player["hp"] = max(0, player["hp"] - props["damage"])
             add_message(messages, f"Ouch! You took {props['damage']} damage! from a {props['name']}!")
             if player["hp"] <= 0:
                 break
