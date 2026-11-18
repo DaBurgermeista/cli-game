@@ -59,7 +59,7 @@ def main(stdscr):
     debug_reveal_map = False
     debug_elevation = False
 
-    room, elevation, player_x, player_y = generate_overworld(
+    room, elevation, biomes, player_x, player_y = generate_overworld(
         WORLD_WIDTH, 
         WORLD_HEIGHT
     )
