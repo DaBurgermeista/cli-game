@@ -4,27 +4,31 @@
         "char": "w",
         "color": 4,
         "hp": 3,
-        "hostile": true
+        "hostile": true,
+        "spawn_weight": 5
     },
     "deer": {
         "name": "Forest Deer",
         "char": "d",
         "color": 3,
         "hp": 2,
-        "hostile": false
+        "hostile": false,
+        "spawn_weight": 8
     },
     "troll": {
         "name": "Cave Troll",
         "char": "T",
         "color": 4,
         "hp": 6,
-        "hostile": true
+        "hostile": true,
+        "spawn_weight": 1
     },
     "beaver": {
         "name": "Woodland Beaver",
         "char": "b",
         "color": 3,
         "hp": 1,
-        "hostile": false
+        "hostile": false,
+        "spawn_weight": 3
     }
 }
