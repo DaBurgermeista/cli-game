@@ -19,5 +19,12 @@
         "color": 4,
         "hp": 6,
         "hostile": true
+    },
+    "beaver": {
+        "name": "Woodland Beaver",
+        "char": "b",
+        "color": 3,
+        "hp": 1,
+        "hostile": false
     }
 }
