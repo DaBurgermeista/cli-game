@@ -80,7 +80,7 @@ def main(stdscr):
     # Temp spot for player info
     health = 3
     has_key = False
-    inventory = []
+    player_inventory = []
 
     messages = [
         "Explore the wilderness.",
