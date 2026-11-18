@@ -2,7 +2,7 @@ import curses
 
 from entities import create_entity, get_entity_at, spawn_random_entities
 from render import draw_map, init_colors, draw_message_log
-from tiles import FLOOR, TILE_DATA
+from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld, find_open_floor
 from vision import get_visible_tiles
 from ui import show_text_panel
@@ -69,32 +69,14 @@ def main(stdscr):
         for _ in range(WORLD_HEIGHT)
     ]
 
-    walkable_tiles = []
-    for y, row in enumerate(room):
-        for x, tile in enumerate(row):
-            if (x, y) == (player_x, player_y):
-                continue
-            
-            if TILE_DATA.get(tile, {}).get("walkable", False):
-                walkable_tiles.append((x, y))
-
-    occupied = {(player_x, player_y)}
-
-    wolf_x, wolf_y = find_open_floor(room, occupied)
-    occupied.add((wolf_x, wolf_y))
-
-    deer_x, deer_y = find_open_floor(room, occupied)
-    occupied.add((deer_x, deer_y))
-
-    troll_x, troll_y = find_open_floor(room, occupied)
+    walkable_tiles = get_walkable_tiles(room, exclude={(player_x, player_y)})
+    entities = spawn_random_entities(room, walkable_tiles, count=15)
 
     health = 3
     has_key = False
     messages = [
         "Explore the wilderness.",
     ]   
-
-    entities = spawn_random_entities(room, walkable_tiles, count=15)
 
     show_text_panel(stdscr, INTRO_TITLE, INTRO_TEXT)
 

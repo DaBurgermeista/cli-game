@@ -165,3 +165,16 @@ TILE_DATA = {
         ),
     },
 }
+
+def get_walkable_tiles(room, exclude=None):
+    if exclude is None:
+        exclude = set()
+
+    walkable = []
+    for y, row in enumerate(room):
+        for x, tile in enumerate(row):
+            if (x, y) in exclude:
+                continue
+            if TILE_DATA.get(tile, {}).get("walkable", False):
+                walkable.append((x, y))
+    return walkable
