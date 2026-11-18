@@ -113,7 +113,7 @@ def main(stdscr):
 
         hud = (
             f"Health: {health} | Key: {'Yes' if has_key else 'No'} "
-            f"| Pos: {player_x}, {player_y}"
+            f"| Pos: {player_x}, {player_y} | Biome: {biomes[player_y][player_x].title()}"
             f"{debug_label}"
         )
         stdscr.addnstr(0, 0, hud, max_x - 1)
