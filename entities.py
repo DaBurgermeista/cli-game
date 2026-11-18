@@ -16,6 +16,7 @@ def create_entity(kind, x, y):
         "char": template["char"],
         "color": template["color"],
         "hp": template["hp"],
+        "attack": template.get("attack", 1),
         "hostile": template["hostile"],
         "x": x,
         "y": y,
@@ -69,3 +70,16 @@ def spawn_random_entities(world_map, biomes, walkable_tiles, count=15):
         entities.append(create_entity(chosen_kind, x, y))
     
     return entities
+
+def attack_entity(attacker, target):
+    damage = attacker.get("base_attack", attacker.get("attack", 1))
+
+    weapon = attacker.get("equipped_weapon")
+    if weapon is not None:
+        damage += weapon.get("value", 0)
+
+    target["hp"] = max(0, target["hp"] - damage)
+
+    if target["hp"] <= 0:
+        return f"{attacker['name']} hits {target['name']} for {damage} damage and defeats it!"
+    return f"{attacker['name']} hits {target['name']} for {damage}! ({target['hp']} HP left.)"

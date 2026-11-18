@@ -1,6 +1,6 @@
 import curses
 
-from entities import create_entity, create_player, get_entity_at, spawn_random_entities
+from entities import create_entity, create_player, get_entity_at, spawn_random_entities, attack_entity
 from items import spawn_random_items, get_item_at, format_inventory, use_item
 from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
@@ -248,7 +248,10 @@ def main(stdscr):
             target_entity = get_entity_at(entities, next_x, next_y)
 
             if target_entity is not None:
-                add_message(messages, f"A {target_entity['name']} blocks your path!")
+                msg = attack_entity(player, target_entity)
+                add_message(messages, msg)
+                if target_entity["hp"] <= 0:
+                    entities.remove(target_entity)
 
             elif can_enter(target_tile, player['has_key']):
                 player_x, player_y = next_x, next_y

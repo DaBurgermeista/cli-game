@@ -4,6 +4,7 @@
         "char": "w",
         "color": 4,
         "hp": 3,
+        "attack": 1,
         "hostile": true,
         "spawn_weight": 5,
         "biomes": ["forest", "highlands"]
@@ -13,6 +14,7 @@
         "char": "d",
         "color": 3,
         "hp": 2,
+        "attack": 1,
         "hostile": false,
         "spawn_weight": 8,
         "biomes": ["forest", "plains", "meadow"]
@@ -31,6 +33,7 @@
         "char": "b",
         "color": 3,
         "hp": 1,
+        "attack": 1,
         "hostile": false,
         "spawn_weight": 3,
         "biomes": ["riverbank", "water"]
@@ -40,6 +43,7 @@
         "char": "B",
         "color": 3,
         "hp": 4,
+        "attack": 1,
         "hostile": true,
         "spawn_weight": 4,
         "biomes": ["forest", "meadow"]
@@ -49,6 +53,7 @@
         "char": "s",
         "color": 4,
         "hp": 4,
+        "attack": 1,
         "hostile": true,
         "spawn_weight": 3,
         "biomes": ["camp", "ruins", "plains"]
@@ -58,6 +63,7 @@
         "char": "v",
         "color": 2,
         "hp": 2,
+        "attack": 1,
         "hostile": true,
         "spawn_weight": 4,
         "biomes": ["riverbank", "water", "meadow"]
@@ -67,6 +73,7 @@
         "char": "g",
         "color": 3,
         "hp": 2,
+        "attack": 1,
         "hostile": false,
         "spawn_weight": 6,
         "biomes": ["highlands"]
@@ -76,6 +83,7 @@
         "char": "*",
         "color": 5,
         "hp": 2,
+        "attack": 1,
         "hostile": false,
         "spawn_weight": 2,
         "biomes": ["shrine", "forest"]
