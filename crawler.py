@@ -6,7 +6,7 @@ from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld, find_open_floor
 from vision import get_visible_tiles
-from ui import show_text_panel
+from ui import show_text_panel, show_inventory_panel
 
 WORLD_WIDTH = 100
 WORLD_HEIGHT = 60
@@ -226,7 +226,7 @@ def main(stdscr):
                     f"{idx + 1}. {item['name']}"
                     for idx, item in enumerate(player_inventory)
                 )
-            show_text_panel(stdscr, "Inventory", inv_text)
+            show_inventory_panel(stdscr, "Inventory", inv_text)
 
         next_x, next_y = player_x, player_y
 
