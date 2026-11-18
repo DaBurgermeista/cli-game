@@ -217,6 +217,9 @@ def main(stdscr):
             else:
                 add_message(messages, "There is nothing here to pick up.")
 
+        if key == ord("i"):
+            show_text_panel(stdscr, "Inventory", f"{player_inventory}")
+
         next_x, next_y = player_x, player_y
 
         if key in (ord("w"), curses.KEY_UP):
