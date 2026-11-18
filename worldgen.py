@@ -233,15 +233,15 @@ def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False, biomes=Non
             if interior_item:
                 center_x = x1 + (w // 2)
                 center_y = y1 + (h // 2)
-                grid[center_y][center_x] = interior_item
+                grid[center_y][center_x] = interior_item            
+
+            if biomes is not None:
+                tag = "ruins" if is_ruin else "building"
+                for y in range(y1, y1 + h):
+                    for x in range(x1, x1 + w):
+                        biomes[y][x] = tag
 
             return True # Successfully places
-
-        if biomes is not None:
-            tag = "ruins" if is_ruin else "building"
-            for y in range(y1, y1 + h):
-                for x in range(x1, x1 + w):
-                    biomes[y][x] = tag
 
     return False # Could not place
 
