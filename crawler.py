@@ -212,13 +212,21 @@ def main(stdscr):
         if key == ord("g"):
             item = get_item_at(items, player_x, player_y)
             if item is not None:
+                items.remove(item)
                 player_inventory.append(item)
                 add_message(messages,f"You pick up the {item['name']}.")
             else:
                 add_message(messages, "There is nothing here to pick up.")
 
         if key == ord("i"):
-            show_text_panel(stdscr, "Inventory", f"{player_inventory}")
+            if not player_inventory:
+                inv_text = "Your pack is empty."
+            else:
+                inv_text = "\n".join(
+                    f"{idx + 1}. {item['name']}"
+                    for idx, item in enumerate(player_inventory)
+                )
+            show_text_panel(stdscr, "Inventory", inv_text)
 
         next_x, next_y = player_x, player_y
 
