@@ -1,9 +1,10 @@
-# 1. Entity Templates
-ENTITY_DATA = {
-    "wolf": {"name": "Timber Wolf", "char": "w", "color": 4, "hp": 3, "hostile": True},
-    "deer": {"name": "Forest Deer", "char": "d", "color": 3, "hp": 2, "hostile": False},
-    "troll": {"name": "Cave Troll", "char": "T", "color": 4, "hp": 6, "hostile": True},
-}
+import json
+from pathlib import Path
+
+DATA_FILE = Path(__file__).parent / "entities.json"
+
+with open(DATA_FILE, "r", encoding="utf-8") as f:
+    ENTITY_DATA = json.load(f)
 
 def create_entity(kind, x, y):
 

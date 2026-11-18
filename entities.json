@@ -1,0 +1,23 @@
+{
+    "wolf": {
+        "name": "Timer Wolf",
+        "char": "w",
+        "color": 4,
+        "hp": 3,
+        "hostile": true
+    },
+    "deer": {
+        "name": "Forest Deer",
+        "char": "d",
+        "color": 3,
+        "hp": 2,
+        "hostile": false
+    },
+    "troll": {
+        "name": "Cave Troll",
+        "char": "T",
+        "color": 4,
+        "hp": 6,
+        "hostile": true
+    }
+}
