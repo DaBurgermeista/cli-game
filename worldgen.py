@@ -369,7 +369,7 @@ def create_biome_map(grid, elevation):
                 biomes[y][x] = "forest"
             elif tile == TALL_GRASS:
                 biomes[y][x] = "meadow"
-            elif tile in (MOUNTAIN, HILL) or elev => 7:
+            elif tile in (MOUNTAIN, HILL) or elev >= 7:
                 biomes[y][x] = "highlands"
             else:
                 biomes[y][x] = "plains"
