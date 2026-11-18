@@ -54,7 +54,7 @@ def spawn_random_items(room, biomes, walkable_tiles, count=12):
 def format_inventory(player):
     lines = []
     for idx, item in enumerate(player["inventory"]):
-        equipped_tag = " [Equipped]" if item is player["equipped_weapon"]
+        equipped_tag = " [Equipped]" if item is player["equipped_weapon"] else ""
         lines.append(f"{idx + 1}. {item['name']}{equipped_tag}")
     return lines
 
