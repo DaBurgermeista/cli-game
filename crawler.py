@@ -2,7 +2,7 @@ import curses
 
 from entities import create_entity, get_entity_at, spawn_random_entities
 from render import draw_map, init_colors, draw_message_log
-from tiles import FLOOR, TILE_DATA
+from tiles import FLOOR, TILE_DATA, is_walkable
 from worldgen import generate_overworld, find_open_floor
 from vision import get_visible_tiles
 from ui import show_text_panel
