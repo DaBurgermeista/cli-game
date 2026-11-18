@@ -87,7 +87,7 @@ def attack_entity(attacker, target):
 def update_entities(entities, room, player, aggro_range=7):
     turn_message = []
     px, py = player["x"], player["y"]
-    occupied = {(e["x"], e["Y"]) for e in entities}
+    occupied = {(e["x"], e["y"]) for e in entities}
 
     for entity in entities:
         if entity["hp"] ex else -1:
