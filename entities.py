@@ -1,4 +1,5 @@
 import json
+import random
 from pathlib import Path
 
 DATA_FILE = Path(__file__).parent / "entities.json"
@@ -26,3 +27,16 @@ def get_entity_at(entities, x, y):
         if entity["x"] == x and entity["y"] == y:
             return entity
     return None
+
+def spawn_random_entities(world_map, walkable_tiles, count=15):
+    entities = []
+    kinds = list(ENTITY_DATA.keys())
+    weights = [ENTITY_DATA[k].get("spawn_weight", 1) for k in kinds]
+
+    chosen_tiles = random.sample(walkable_tiles, min(count, len(walkable_tiles)))
+
+    for x, y in chosen_tiles:
+        kind = random.choices(kinds, weights=weights, k=1)[0]
+        entities.append(create_entity(kind, x, y))
+    
+    return entities

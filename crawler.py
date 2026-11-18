@@ -1,6 +1,6 @@
 import curses
 
-from entities import create_entity, get_entity_at
+from entities import create_entity, get_entity_at, spawn_random_entities
 from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA
 from worldgen import generate_overworld, find_open_floor
@@ -69,6 +69,15 @@ def main(stdscr):
         for _ in range(WORLD_HEIGHT)
     ]
 
+    walkable_tiles = []
+    for y, row in enumerate(room):
+        for x, tile in enumerate(row):
+            if (x, y) == (player_x, player_y):
+                continue
+            
+            if is_walkable(tile):
+                walkable_tiles.append((x, y))
+
     occupied = {(player_x, player_y)}
 
     wolf_x, wolf_y = find_open_floor(room, occupied)
@@ -85,11 +94,7 @@ def main(stdscr):
         "Explore the wilderness.",
     ]   
 
-    entities = [
-        create_entity("wolf", wolf_x, wolf_y),
-        create_entity("deer", deer_x, deer_y),
-        create_entity("troll", troll_x, troll_y),
-    ]
+    entities = spawn_random_entities(room, walkable_tiles, count=15)
 
     show_text_panel(stdscr, INTRO_TITLE, INTRO_TEXT)
 
