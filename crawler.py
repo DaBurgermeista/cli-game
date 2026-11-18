@@ -1,7 +1,7 @@
 import curses
 
 from entities import create_entity, create_player, get_entity_at, spawn_random_entities
-from items import spawn_random_items, get_item_at
+from items import spawn_random_items, get_item_at, format_inventory, use_item
 from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld, find_open_floor
@@ -220,11 +220,11 @@ def main(stdscr):
             if not player["inventory"]:
                 show_text_panel(stdscr, "Inventory", "Your pack is empty.")
             else:
-                inv_text = [
-                    f"{idx + 1}. {item['name']}"
-                    for idx, item in enumerate(player["inventory"])
-                ]
-                choice = show_inventory_panel(stdscr, "Inventory", inv_text)
+                inv_lines = format_inventory(player)
+                choice = show_inventory_panel(stdscr, "Inventory", inv_lines)
+                msg = use_item(player, choice)
+                if msg:
+                    add_message(messages, msg)
 
         next_x, next_y = player_x, player_y
 

@@ -50,3 +50,29 @@ def spawn_random_items(room, biomes, walkable_tiles, count=12):
         items.append(create_item(chosen_kind, x, y))
     
     return items
+
+def format_inventory(player):
+    lines = []
+    for idx, item in enumerate(player["inventory"]):
+        equipped_tag = " [Equipped]" if item is player["equipped_weapon"]
+        lines.append(f"{idx + 1}. {item['name']}{equipped_tag}")
+    return lines
+
+def use_item(player, choice):
+    inventory = player["inventory"]
+    if choice is None or not (0 <= choice < len(inventory)):
+        return None
+
+    selected_item = inventory[choice]
+
+    if selected_item["type"] == "heal":
+        player["hp"] = min(player["hp"], player["hp"] + selected_item["value"])
+        inventory.pop(choice)
+        return f"You use the {selected_item['name']} and recover {selected_item['value']} health."
+
+    if selected_item["type"] == "weapon":
+        player["equipped_weapon"] = selected_item
+        return f"You equip the {selected_item['name']} (+{selected_item['value']} attack)."
+    
+    return f"You can't use the {selected_item['name'].}"
+
