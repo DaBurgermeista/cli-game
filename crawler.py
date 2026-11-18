@@ -1,7 +1,7 @@
 import curses
 
 from entities import create_entity, get_entity_at, spawn_random_entities
-from items import spawn_random_items, get_items_at
+from items import spawn_random_items, get_item_at
 from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld, find_open_floor
