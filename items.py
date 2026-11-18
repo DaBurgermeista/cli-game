@@ -74,5 +74,5 @@ def use_item(player, choice):
         player["equipped_weapon"] = selected_item
         return f"You equip the {selected_item['name']} (+{selected_item['value']} attack)."
     
-    return f"You can't use the {selected_item['name'].}"
+    return f"You can't use the {selected_item['name']}."
 
