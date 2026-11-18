@@ -75,7 +75,7 @@ def main(stdscr):
             if (x, y) == (player_x, player_y):
                 continue
             
-            if tile.get("walkable"):
+            if TILE_DATA.get(tile, {}).get("walkable", False):
                 walkable_tiles.append((x, y))
 
     occupied = {(player_x, player_y)}
