@@ -118,7 +118,7 @@ def main(stdscr):
             debug_label = " | Elevation: On"
 
         hud = (
-            f"Health: {player['hp']} | Key: {'Yes' if player['has_key'] else 'No'} "
+            f"Health: {player['hp']}/{player['max_hp']} | Key: {'Yes' if player['has_key'] else 'No'} "
             f"| Pos: {player_x}, {player_y} | Biome: {biomes[player_y][player_x].title()}"
             f"{debug_label}"
         )

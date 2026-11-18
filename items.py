@@ -66,6 +66,8 @@ def use_item(player, choice):
     selected_item = inventory[choice]
 
     if selected_item["type"] == "heal":
+        if player["hp"] >= player["max_hp"]:
+            return "You are already at full health."
         player["hp"] = min(player["hp"], player["hp"] + selected_item["value"])
         inventory.pop(choice)
         return f"You use the {selected_item['name']} and recover {selected_item['value']} health."
