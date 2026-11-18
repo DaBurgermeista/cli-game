@@ -365,7 +365,7 @@ def create_biome_map(grid, elevation):
                 biomes[y][x] = "water"
             elif tile == BANK:
                 biomes[y][x] = "riverbank"
-            elif tiles == TREE:
+            elif tile == TREE:
                 biomes[y][x] = "forest"
             elif tile == TALL_GRASS:
                 biomes[y][x] = "meadow"
