@@ -266,6 +266,7 @@ def main(stdscr):
 
             elif can_enter(target_tile, player['has_key']):
                 player_x, player_y = next_x, next_y
+                player["x"], player["y"] = player_x, player_y
                 add_message(messages, target_props.get("enter_msg", ""))
 
             else:
@@ -306,7 +307,7 @@ def main(stdscr):
             break
         
         if took_turn:
-            for msg in update_entities(entites, room, player):
+            for msg in update_entities(entities, room, player):
                 add_message(messages, msg)
 
             if player["hp"] <= 0:

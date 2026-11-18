@@ -2,6 +2,8 @@ import json
 import random
 from pathlib import Path
 
+from tiles import TILE_DATA
+
 DATA_FILE = Path(__file__).parent / "entities.json"
 
 with open(DATA_FILE, "r", encoding="utf-8") as f:
@@ -90,7 +92,18 @@ def update_entities(entities, room, player, aggro_range=7):
     occupied = {(e["x"], e["y"]) for e in entities}
 
     for entity in entities:
-        if entity["hp"] ex else -1:
+        if entity["hp"] <= 0:
+            continue
+
+        ex, ey = entity["x"], entity["y"]
+        distance = abs(px - ex) + abs(py - ey)
+
+        if entity.get("hostile", False) and distance <= aggro_range:
+            if distance == 1:
+                turn_message.append(attack_entity(entity, player))
+                continue
+
+            dx = 0 if px == ex else (1 if px > ex else -1)
             dy = 0 if py == ey else (1 if py > ey else - 1)
 
             candidates = []
@@ -101,6 +114,8 @@ def update_entities(entities, room, player, aggro_range=7):
             random.shuffle(candidates)
 
             for nx, ny in candidates:
+                if not (0 <= ny < len(room) and 0 <= nx < len(room[0])):
+                    continue
                 if (nx, ny) == (px, py) or (nx, ny) in occupied:
                     continue
                 if TILE_DATA.get(room[ny][nx], {}).get("walkable", False):
@@ -112,6 +127,8 @@ def update_entities(entities, room, player, aggro_range=7):
         elif random.random() < 0.4:
             dx, dy = random.choice([(0, -1), (0, 1), (-1, 0), (1, 0)])
             nx, ny = ex + dx, ey + dy
+            if not (0 <= ny < len(room) and 0 <= nx < len(room[0])):
+                continue
             if (nx, ny) != (px, py) and (nx, ny) not in occupied:
                 if TILE_DATA.get(room[ny][nx], {}).get("walkable", False):
                     occupied.remove((ex, ey))
