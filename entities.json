@@ -5,7 +5,8 @@
         "color": 4,
         "hp": 3,
         "hostile": true,
-        "spawn_weight": 5
+        "spawn_weight": 5,
+        "biomes": ["forest", "highlands"]
     },
     "deer": {
         "name": "Forest Deer",
@@ -13,7 +14,8 @@
         "color": 3,
         "hp": 2,
         "hostile": false,
-        "spawn_weight": 8
+        "spawn_weight": 8,
+        "biomes": ["forest", "plains", "meadows"]
     },
     "troll": {
         "name": "Cave Troll",
@@ -21,7 +23,8 @@
         "color": 4,
         "hp": 6,
         "hostile": true,
-        "spawn_weight": 1
+        "spawn_weight": 1,
+        "biomes": ["ruins", "highlands"]
     },
     "beaver": {
         "name": "Woodland Beaver",
@@ -29,6 +32,7 @@
         "color": 3,
         "hp": 1,
         "hostile": false,
-        "spawn_weight": 3
+        "spawn_weight": 3,
+        "biomes": ["riverbank", "water"]
     }
 }

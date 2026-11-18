@@ -186,7 +186,7 @@ def stamp_forest_near_water(grid, scale=0.05):
         wx, wy = random.choice(water_tiles)
         stamp_blob(grid, wx, wy, TREE, scale=scale)
 
-def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
+def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False, biomes=None):
     height = len(grid)
     width = len(grid[0])
 
@@ -236,9 +236,16 @@ def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False):
                 grid[center_y][center_x] = interior_item
 
             return True # Successfully places
+
+        if biomes is not None:
+            tag = "ruins" if is_ruin else "building"
+            for y in range(y1, y1 + h):
+                for x in range(x1, x1 + w):
+                    biomes[y][x] = tag
+
     return False # Could not place
 
-def stamp_shrine(grid):
+def stamp_shrine(grid, biomes=None):
     height = len(grid)
     width = len(grid[0])
 
@@ -270,6 +277,11 @@ def stamp_shrine(grid):
 
         grid[center_y][center_x] = SHRINE
 
+        if biomes is not None:
+            for y in range(center_y - 2, center_y + 3):
+                for x in range(center_x - 2, center_x + 3):
+                    biomes[y][x] = "shrine"
+
         return {
             "kind": "shrine",
             "x": center_x,
@@ -278,7 +290,7 @@ def stamp_shrine(grid):
 
     return None
 
-def stamp_abandoned_camp(grid):
+def stamp_abandoned_camp(grid, biomes=None):
     height = len(grid)
     width = len(grid[0])
 
@@ -310,6 +322,11 @@ def stamp_abandoned_camp(grid):
         grid[center_y][center_x - 1] = ROCK
         grid[center_y][center_x + 1] = ROCK
 
+        if biomes is not None:
+            for y in range(center_y - 2, center_y + 3):
+                for x in range(center_x - 2, center_x + 3):
+                    biomes[y][x] = "camp"
+
         return {
             "kind": "abandoned_camp",
             "x": center_x,
@@ -333,6 +350,31 @@ def find_open_floor(grid, occupied=None):
         raise RuntimeError("No open floor tiles are available.")
 
     return random.choice(floor_tiles)
+
+def create_biome_map(grid, elevation):
+    height = len(grid)
+    width = len(grid[0])
+    biomes = [["plains" for _ in range(width)] for _ in range(height)]
+
+    for y in range(height):
+        for x in range(width):
+            tile = grid[y][x]
+            elev = elevation[y][x]
+
+            if tile in (WATER, BRIDGE):
+                biomes[y][x] = "water"
+            elif tile == BANK:
+                biomes[y][x] = "riverbank"
+            elif tiles == TREE:
+                biomes[y][x] = "forest"
+            elif tile == TALL_GRASS:
+                biomes[y][x] = "meadow"
+            elif tile in (MOUNTAIN, HILL) or elev => 7:
+                biomes[y][x] = "highlands"
+            else:
+                biomes[y][x] = "plains"
+    
+    return biomes
 
 def generate_overworld(map_width, map_height):
     elevation = create_elevation_map(map_width, map_height)
@@ -369,12 +411,15 @@ def generate_overworld(map_width, map_height):
             replaceable_tiles=(FLOOR,),
         )
 
+    biomes = create_biome_map(room, elevation)
+
     key_placed = stamp_building(
         room, 
         w=7, 
         h=5, 
         interior_item=KEY, 
         is_ruin=True,
+        biomes=biomes
     )
     exit_placed = stamp_building(
         room, 
@@ -382,6 +427,7 @@ def generate_overworld(map_width, map_height):
         h=6, 
         interior_item=EXIT, 
         is_ruin=False,
+        biomes=biomes
     )
 
     if not key_placed:
@@ -390,11 +436,11 @@ def generate_overworld(map_width, map_height):
     if not exit_placed:
         raise RuntimeError("Could not place the exit building.")
 
-    stamp_building(room, w=6, h=5, is_ruin=True)
-    stamp_building(room, w=8, h=5, is_ruin=True)
+    stamp_building(room, w=6, h=5, is_ruin=True, biomes=biomes)
+    stamp_building(room, w=8, h=5, is_ruin=True, biomes=biomes)
 
-    shrine = stamp_shrine(room)
-    camp = stamp_abandoned_camp(room)
+    shrine = stamp_shrine(room, biomes=biomes)
+    camp = stamp_abandoned_camp(room, biomes=biomes)
 
     if shrine is None:
         raise RuntimeError("Could not place shrine.")
@@ -404,4 +450,4 @@ def generate_overworld(map_width, map_height):
 
     player_x, player_y = find_open_floor(room)
 
-    return room, elevation, player_x, player_y
+    return room, elevation, biomes, player_x, player_y
