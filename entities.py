@@ -21,6 +21,22 @@ def create_entity(kind, x, y):
         "y": y,
     }
 
+def create_player(x, y):
+    return {
+        "kind": "player",
+        "name": "Adventurer",
+        "char": "@",
+        "color": 1,
+        "hp": 3,
+        "max_hp": 5,
+        "base_attack": 1,
+        "has_key": False,
+        "inventory": [],
+        "equipped_weapon": None,
+        "x": x,
+        "y": y,
+    }
+
 def get_entity_at(entities, x, y):
 
     for entity in entities:

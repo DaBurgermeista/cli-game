@@ -1,6 +1,6 @@
 import curses
 
-from entities import create_entity, get_entity_at, spawn_random_entities
+from entities import create_entity, create_player, get_entity_at, spawn_random_entities
 from items import spawn_random_items, get_item_at
 from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
@@ -77,10 +77,8 @@ def main(stdscr):
     item_tiles = get_walkable_tiles(room, exclude=occupied_by_entities)
     items = spawn_random_items(room, biomes, item_tiles, count=12)
 
-    # Temp spot for player info
-    health = 3
-    has_key = False
-    player_inventory = []
+    # create player
+    player = create_player(player_x, player_y)
 
     messages = [
         "Explore the wilderness.",
@@ -120,7 +118,7 @@ def main(stdscr):
             debug_label = " | Elevation: On"
 
         hud = (
-            f"Health: {health} | Key: {'Yes' if has_key else 'No'} "
+            f"Health: {player['hp']} | Key: {'Yes' if player['has_key'] else 'No'} "
             f"| Pos: {player_x}, {player_y} | Biome: {biomes[player_y][player_x].title()}"
             f"{debug_label}"
         )
@@ -213,18 +211,18 @@ def main(stdscr):
             item = get_item_at(items, player_x, player_y)
             if item is not None:
                 items.remove(item)
-                player_inventory.append(item)
+                player["inventory"].append(item)
                 add_message(messages,f"You pick up the {item['name']}.")
             else:
                 add_message(messages, "There is nothing here to pick up.")
 
         if key == ord("i"):
-            if not player_inventory:
+            if not player["inventory"]:
                 show_text_panel(stdscr, "Inventory", "Your pack is empty.")
             else:
                 inv_text = [
                     f"{idx + 1}. {item['name']}"
-                    for idx, item in enumerate(player_inventory)
+                    for idx, item in enumerate(player["inventory"])
                 ]
                 choice = show_inventory_panel(stdscr, "Inventory", inv_text)
 
@@ -266,10 +264,14 @@ def main(stdscr):
         # 4. Interaction System reads flags from TILE_DATA
         current_tile = room[player_y][player_x]
         props = TILE_DATA[current_tile]
+        ground_item = get_item_at(items, player_x, player_y)
+
+        if ground_item is not None:
+            add_message(messages, f"You see a {ground_item['name']} here.")
         
         if props.get("pickup")  == "key":
             add_message(messages, "You found a key.")
-            has_key = True
+            player["has_key"] = True
             room[player_y][player_x] = FLOOR
         
         if props.get("need_key"):
@@ -277,9 +279,9 @@ def main(stdscr):
             add_message(messages, "You unlocked the door!")
         
         if "damage" in props:
-            health = max(0, health - props["damage"])
+            player["hp"] = max(0, health - props["damage"])
             add_message(messages, f"Ouch! You took {props['damage']} damage! from a {props['name']}!")
-            if health <= 0:
+            if player["hp"] <= 0:
                 break
         
         if "text" in props:
