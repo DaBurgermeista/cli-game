@@ -1,6 +1,13 @@
 import curses
 
-from entities import create_entity, create_player, get_entity_at, spawn_random_entities, attack_entity
+from entities import (
+    create_entity, 
+    create_player, 
+    get_entity_at, 
+    spawn_random_entities, 
+    attack_entity,
+    update_entities
+)
 from items import spawn_random_items, get_item_at, format_inventory, use_item
 from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
@@ -87,6 +94,8 @@ def main(stdscr):
     show_text_panel(stdscr, INTRO_TITLE, INTRO_TEXT)
 
     while True:
+        
+        took_turn = False
 
         max_y, max_x = stdscr.getmaxyx()
     
@@ -215,6 +224,7 @@ def main(stdscr):
                 add_message(messages,f"You pick up the {item['name']}.")
             else:
                 add_message(messages, "There is nothing here to pick up.")
+            took_turn = True
 
         if key == ord("i"):
             if not player["inventory"]:
@@ -236,6 +246,7 @@ def main(stdscr):
             next_x -= 1
         elif key in (ord("d"), curses.KEY_RIGHT):
             next_x += 1
+        took_turn = True
 
         # 3. Movement System checks TILE_DATA
         if (next_x, next_y) != (player_x, player_y):
@@ -293,5 +304,13 @@ def main(stdscr):
         if props.get("exit"):
             show_text_panel(stdscr, "Victory!", "Good Job! You found the super easy to get to exit!\n")
             break
+        
+        if took_turn:
+            for msg in update_entities(entites, room, player):
+                add_message(messages, msg)
+
+            if player["hp"] <= 0:
+                show_text_panel(stdscr, "Defeated!", "You died")
+                break
 
 curses.wrapper(main)

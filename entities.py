@@ -83,3 +83,38 @@ def attack_entity(attacker, target):
     if target["hp"] <= 0:
         return f"{attacker['name']} hits {target['name']} for {damage} damage and defeats it!"
     return f"{attacker['name']} hits {target['name']} for {damage}! ({target['hp']} HP left.)"
+
+def update_entities(entities, room, player, aggro_range=7):
+    turn_message = []
+    occupied = {(e["x"], e["Y"]) for e in entities}
+
+    for entity in entities:
+        if entity["hp"] ex else -1:
+            dy = 0 if py == ey else (1 if py > ey else - 1)
+
+            candidates = []
+            if dx != 0:
+                candidates.append((ex + dx, ey))
+            if dy != 0:
+                candidates.append((ex, ey + dy))
+            random.shuffle(candidates)
+
+            for nx, ny in candidates:
+                if (nx, ny) == (px, py) or (nx, ny) in occupied:
+                    continue
+                if TILE_DATA.get(room[ny][nx], {}).get("walkable", False):
+                    occupied.remove((ex, ey))
+                    entity["x"], entity["y"] = nx, ny
+                    occupied.add((nx, ny))
+                    break
+
+        elif random.random() < 0.4:
+            dx, dy = random.choice([(0, -1), (0, 1), (-1, 0), (1, 0)])
+            nx, ny = ex + dx, ey + dy
+            if (nx, ny) != (px, py) and (nx, ny) not in occupied:
+                if TILE_DATA.get(room[ny][nx], {}).get("walkable", False):
+                    occupied.remove((ex, ey))
+                    entity["x"], entity["y"] = nx, ny
+                    occupied.add((nx, ny))
+    
+    return turn_message
