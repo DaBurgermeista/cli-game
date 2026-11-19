@@ -33,8 +33,17 @@ def create_player(x, y):
         "hp": 5,
         "max_hp": 10,
         "base_attack": 1,
+        "stats": {
+            "str": 1,
+            "dex": 1,
+            "con": 1,
+            "int": 1,
+            "wis": 1,
+            "luck": 1,
+        }
         "has_key": False,
         "inventory": [],
+        "money": 0
         "equipped_weapon": None,
         "x": x,
         "y": y,
