@@ -76,28 +76,34 @@ def main(stdscr):
 
     debug_reveal_map = False
     debug_elevation = False
+    while True:
+        # Shows main menu on launch
+        menu_choice = show_main_menu(stdscr)
 
-    menu_choice = show_main_menu(stdscr)
+        if menu_choice == "Quit":
+            return
+        
+        if menu_choice == "Credits":
+            show_text_panel(
+                stdscr,
+                "Credits",
+                "Created by DaBurgermeista",
+            )
+            continue
+        
+        if menu_choice == "Options":
+            # TODO(#1): Create options menu
+            show_text_panel(
+                stdscr,
+                "Options",
+                "Options are not implemented yet.",
+            )
+            continue
+        
+        if menu_choice == "New Game":
+            break
 
-    if menu_choice == "Quit":
-        return
-    
-    if menu_choice == "Credits":
-        show_text_panel(
-            stdscr,
-            "Credits",
-            "Created by DaBurgermeista",
-        )
-        return
-    
-    if menu_choice == "Options":
-        show_text_panel(
-            stdscr,
-            "Options",
-            "Options are not implemented yet.",
-        )
-        return
-
+    # Begins world generation
     room, elevation, biomes, player_x, player_y = generate_overworld(
         WORLD_WIDTH,
         WORLD_HEIGHT,
