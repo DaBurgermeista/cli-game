@@ -40,10 +40,10 @@ def create_player(x, y):
             "int": 1,
             "wis": 1,
             "luck": 1,
-        }
+        },
         "has_key": False,
         "inventory": [],
-        "money": 0
+        "money": 0,
         "equipped_weapon": None,
         "x": x,
         "y": y,
