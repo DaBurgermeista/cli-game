@@ -119,7 +119,7 @@ def apply_hills(grid, elevation, hill_height=7):
 
     for y in range(1, height - 1):
         for x in range(1, width - 1):
-            # Only elevation 7 floors become hills
+            # Remaining high-elevation floor tiles become hills.
             if elevation[y][x] >= hill_height and grid[y][x] == FLOOR:
                 grid[y][x] = HILL
 
