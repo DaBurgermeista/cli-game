@@ -80,6 +80,29 @@ def create_elevation_map(width, height):
 
     return elevation
 
+def smooth_elevation(elevation, passes=2):
+    height = len(elevation)
+    width = len(elevation[0])
+
+    for _ in range(passes):
+        result = [row[:] for row in elevation]
+
+        for y in range(1, height - 1):
+            for x in range(1, width - 1):
+                neighbors = [
+                    elevation[y - 1][x],
+                    elevation[y + 1][x],
+                    elevation[y][x - 1],
+                    elevation[y][x + 1],
+                    elevation[y][x],
+                ]
+
+                result[y][x] = round(sum(neighbors) / len(neighbors))
+
+        elevation = result
+
+    return elevation
+
 def apply_mountains(grid, elevation, mountain_height=8):
     height = len(grid)
     width = len(grid[0])
@@ -389,6 +412,8 @@ def generate_overworld(map_width, map_height, seed=None):
         )
 
     elevation = create_elevation_map(map_width, map_height)
+    smooth_elevation(elevation, passes=2)
+    
     room = create_overworld(map_width, map_height)
 
     # Generate Water Features first
