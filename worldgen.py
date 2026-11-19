@@ -465,11 +465,24 @@ def generate_overworld(map_width, map_height, seed=None):
     scatter_rocks(room, elevation)
 
     # Put forests in by water
-    for _ in range(4):
+    for _ in range(3):
         stamp_forest_near_water(
             room,
             scale=0.01,
             clusters=2,
+        )
+    
+    # Larger inland forest regions.
+    for _ in range(3):
+        forest_x = random.randint(8, map_width - 9)
+        forest_y = random.randint(8, map_height - 9)
+        forest_radius = random.randint(5, 9)
+
+        stamp_forest_patch(
+            room,
+            forest_x,
+            forest_y,
+            forest_radius,
         )
 
     # Add open-field texture
