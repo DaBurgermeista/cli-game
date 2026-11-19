@@ -376,7 +376,10 @@ def create_biome_map(grid, elevation):
     
     return biomes
 
-def generate_overworld(map_width, map_height):
+def generate_overworld(map_width, map_height, seed=None):
+    if seed is not None:
+        random.seed(seed)
+
     elevation = create_elevation_map(map_width, map_height)
     room = create_overworld(map_width, map_height)
 
