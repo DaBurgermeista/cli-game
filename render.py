@@ -1,6 +1,6 @@
 import curses
 
-from tiles import FLOOR, TILE_DATA
+from tiles import FLOOR, TILE_DATA, HILL
 
 
 def safe_addch(stdscr, y, x, char, attr=0):
