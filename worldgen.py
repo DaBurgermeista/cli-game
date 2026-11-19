@@ -64,7 +64,7 @@ def raise_mountain_range(
     ])
 
     for _ in range(segments):
-        radius = random.randint(4, 7)
+        radius = random.randint(3, 5)
 
         # Slight peak variation avoids identical mountain domes.
         local_peak = max(
@@ -149,7 +149,7 @@ def create_elevation_map(width, height):
             elevation,
             start_x,
             start_y,
-            segments=random.randint(3, 5),
+            segments=random.randint(4, 7),
             peak_height=random.randint(8, MAX_ELEVATION),
         )
 
