@@ -40,7 +40,13 @@ def raise_hill(elevation, center_x, center_y, radius, peak_height):
 
             elevation[y][x] = max(elevation[y][x], tile_height)
 
-def lower_basin(elevation, center_x, center_y, radius, depth):
+def lower_basin(
+    elevation,
+    center_x,
+    center_y,
+    radius,
+    floor_elevation=1,
+):
     height = len(elevation)
     width = len(elevation[0])
 
@@ -58,13 +64,20 @@ def lower_basin(elevation, center_x, center_y, radius, depth):
                 continue
 
             distance = distance_squared ** 0.5
-            falloff = 1 - (distance / radius)
 
-            lowering = round(depth * falloff)
+            # Center is low; the basin rises gradually to BASE_ELEVATION
+            # at its outer edge.
+            progress_to_edge = distance / radius
 
-            elevation[y][x] = max(
-                0,
-                elevation[y][x] - lowering,
+            target_elevation = round(
+                floor_elevation
+                + (BASE_ELEVATION - floor_elevation) * progress_to_edge
+            )
+
+            # Never raise terrain; only lower it toward the basin shape.
+            elevation[y][x] = min(
+                elevation[y][x],
+                target_elevation,
             )
 
 def create_elevation_map(width, height):
