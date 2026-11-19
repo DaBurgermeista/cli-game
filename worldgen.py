@@ -70,6 +70,28 @@ def raise_mountain_range(
         local_peak = max(
             8,
             min(
+                MAX_ELEVATION,
+                peak_height + random.choice([-1, 0, 0, 1]),
+            ),
+        )
+
+        raise_hill(
+            elevation,
+            x,
+            y,
+            radius,
+            local_peak,
+        )
+
+        # Advance the next peak several cells, with slight lateral wobble.
+        step_size = random.randint(3, 5)
+
+        x += direction_x * step_size + random.randint(-1, 1)
+        y += direction_y * step_size + random.randint(-1, 1)
+
+        # Keep future peaks safely inside the map.
+        x = max(8, min(width - 9, x))
+        y = max(8, min(height - 9, y))
          
 
 def lower_basin(
