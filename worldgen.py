@@ -154,48 +154,91 @@ def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04, replaceable_tile
         fx += dx
         fy += dy
 
-def carve_river(grid):
+def carve_river(grid, elevation, bridge_y=None):
     height = len(grid)
     width = len(grid[0])
 
-    # Start somewhere near the middle-ish of the top border
+    if bridge_y is None:
+        bridge_y = random.randint(height // 3, (height * 2) // 3)
+
+    bridge_rows = {bridge_y, bridge_y + 1}
+
+    river_width = random.choice([2, 3])
     rx = random.randint(width // 4, (width * 3) // 4)
-    bridge_y = height // 2
 
-    drift = random.choice([-1, 1])
-    bend_timer = random.randint(4, 8)
-    river_width = 2
+    river_path = []
 
-    # Go from top border (y=1) to bottom border (height - 2)
     for ry in range(1, height - 1):
-        left_bank = rx - 1
-        right_bank =  rx + river_width
-        if 1 < left_bank < width - 2 and grid[ry][left_bank] == FLOOR:
-            grid[ry][left_bank] = BANK
-        if 1 < right_bank < width - 2 and grid[ry][right_bank] == FLOOR:
-            grid[ry][right_bank] = BANK
+        # Occasionally vary river width, but keep it narrow enough to cross.
+        if random.random() < 0.15:
+            river_width = max(
+                2,
+                min(4, river_width + random.choice([-1, 1])),
+            )
+
+        min_x = 2
+        max_x = width - river_width - 3
+
+        # The river can drift one tile left, right, or continue straight.
+        candidate_xs = [
+            candidate_x
+            for candidate_x in (rx - 1, rx, rx + 1)
+            if min_x <= candidate_x <= max_x
+        ]
+
+        # Score each possible path by its elevation ahead of the river.
+        # Lower terrain is more likely, but randomness prevents rigid routes.
+        candidate_scores = []
+
+        for candidate_x in candidate_xs:
+            samples = []
+
+            for look_ahead_y in range(ry, min(height - 1, ry + 3)):
+                for offset in range(river_width):
+                    samples.append(
+                        elevation[look_ahead_y][candidate_x + offset]
+                    )
+
+            candidate_scores.append(sum(samples) / len(samples))
+
+        lowest_score = min(candidate_scores)
+
+        # Lower elevations receive higher weight. The +1 avoids division by zero.
+        weights = [
+            1 / (score - lowest_score + 1)
+            for score in candidate_scores
+        ]
+
+        rx = random.choices(
+            candidate_xs,
+            weights=weights,
+            k=1,
+        )[0]
+
+        river_path.append((rx, ry, river_width))
+
+    # Lay down the river after choosing its full path.
+    for rx, ry, river_width in river_path:
+        tile_type = BRIDGE if ry in bridge_rows else WATER
 
         for offset in range(river_width):
-            curr_x = rx + offset
-            if 1 < curr_x < width - 2:
-                if ry == bridge_y or ry == bridge_y + 1:
-                    grid[ry][curr_x] = BRIDGE
-                else:
-                    grid[ry][curr_x] = WATER
+            grid[ry][rx + offset] = tile_type
 
-        # Handle momentum so the river makes wide, natural S-curves
-        bend_timer -= 1
-        if bend_timer <= 0:
-            drift = random.choice([-1, 0, 1])
-            bend_timer = random.randint(4, 8)
+    # Add banks after the river so bends do not overwrite them.
+    for rx, ry, river_width in river_path:
+        left_bank_x = rx - 1
+        right_bank_x = rx + river_width
 
-        # Occasionally widen or narrow the channel
-        if random.random() < 0.25:
-            river_width = max(2, min(4, river_width + random.choice([-1, 1])))
+        if grid[ry][left_bank_x] == FLOOR:
+            grid[ry][left_bank_x] = BANK
 
-        # Move horizontally by 1 or 2 in current drift direction
-        step = drift * random.choice([1, 1, 2])
-        rx = max(3, min(width - river_width - 3, rx + step))
+        if grid[ry][right_bank_x] == FLOOR:
+            grid[ry][right_bank_x] = BANK
+
+    return {
+        "bridge_y": bridge_y,
+        "path": river_path,
+    }
 
 def stamp_forest_near_water(grid, scale=0.02, clusters=4):
     water_tiles = [
@@ -452,7 +495,7 @@ def generate_overworld(map_width, map_height, seed=None):
 
     # Generate Water Features first
     ## Generate River
-    carve_river(room)
+    river_data = carve_river(room, elevation)
 
     ## Stamp Lakes
     for _ in range(3):
