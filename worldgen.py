@@ -576,6 +576,8 @@ def generate_overworld(map_width, map_height, seed=None):
     elevation = smooth_elevation(elevation, passes=2)
 
     # Add basins after smoothing so their low elevations remain visible.
+    basins = []
+
     for _ in range(2):
         basin_x = random.randint(
             map_width // 5,
@@ -586,12 +588,19 @@ def generate_overworld(map_width, map_height, seed=None):
             map_height - (map_height // 4) - 1,
         )
 
+        basin_radius = random.randint(4, 7)
+        basin_floor = random.choice([1, 2])
+
         lower_basin(
             elevation,
             basin_x,
             basin_y,
-            radius=random.randint(4, 7),
-            floor_elevation=random.choice([1, 2]),
+            radius=basin_radius,
+            floor_elevation=basin_floor,
+        )
+
+        basins.append(
+            (basin_x, basin_y, basin_radius)
         )
 
     room = create_overworld(map_width, map_height)
@@ -601,15 +610,13 @@ def generate_overworld(map_width, map_height, seed=None):
     river_data = carve_river(room, elevation)
 
     ## Stamp Lakes
-    for _ in range(3):
-        lake_x = random.randint(6, map_width - 7)
-        lake_y = random.randint(6, map_height - 7)
-
+    # Turn low-elevation basins into lakes.
+    for basin_x, basin_y, basin_radius in basins:
         stamp_lake(
             room,
-            lake_x,
-            lake_y,
-            radius=random.randint(3, 6),
+            basin_x,
+            basin_y,
+            radius=max(3, basin_radius - 1),
         )
 
     apply_mountains(room, elevation)
