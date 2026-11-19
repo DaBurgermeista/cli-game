@@ -197,19 +197,23 @@ def carve_river(grid):
         step = drift * random.choice([1, 1, 2])
         rx = max(3, min(width - river_width - 3, rx + step))
 
-def stamp_forest_near_water(grid, scale=0.05):
-    water_tiles = []
+def stamp_forest_near_water(grid, scale=0.02, clusters=4):
+    water_tiles = [
+        (x, y)
+        for y, row in enumerate(grid)
+        for x, tile in enumerate(row)
+        if tile == WATER
+    ]
 
-    # Find every water tile on the map
-    for y, row in enumerate(grid):
-        for x, tile in enumerate(row):
-            if tile == WATER:
-                water_tiles.append((x, y))
+    if not water_tiles:
+        return
 
-    # Pick a random water tile and start a tree blob
-    if water_tiles:
-        wx, wy = random.choice(water_tiles)
-        stamp_blob(grid, wx, wy, TREE, scale=scale)
+    wx, wy = random.choice(water_tiles)
+
+    for _ in range(clusters):
+        start_x = wx + random.randint(-4, 4)
+        start_y = wy + random.randint(-4, 4)
+        stamp_blob(grid, start_x, start_y, TREE, scale=scale)
 
 def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False, biomes=None):
     height = len(grid)
@@ -413,7 +417,7 @@ def generate_overworld(map_width, map_height, seed=None):
 
     elevation = create_elevation_map(map_width, map_height)
     smooth_elevation(elevation, passes=2)
-    
+
     room = create_overworld(map_width, map_height)
 
     # Generate Water Features first
