@@ -15,12 +15,19 @@ def init_colors():
     curses.start_color()
     curses.use_default_colors()
 
+    # Existing general-purpose foreground colors.
     curses.init_pair(1, curses.COLOR_WHITE, -1)
     curses.init_pair(2, curses.COLOR_GREEN, -1)
     curses.init_pair(3, curses.COLOR_YELLOW, -1)
     curses.init_pair(4, curses.COLOR_RED, -1)
     curses.init_pair(5, curses.COLOR_CYAN, -1)
     curses.init_pair(6, curses.COLOR_BLUE, -1)
+
+    # Terrain-specific background pairs.
+    curses.init_pair(7, curses.COLOR_WHITE, curses.COLOR_BLUE)    # Water
+    curses.init_pair(8, curses.COLOR_CYAN, curses.COLOR_BLUE)     # Deep water / basin
+    curses.init_pair(9, curses.COLOR_BLACK, curses.COLOR_YELLOW)  # Dry hills
+    curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_RED)    # Hazard / warning
 
 def draw_message_log(stdscr, messages, start_y, width, height):
     # Clear every row belonging to the message area. 

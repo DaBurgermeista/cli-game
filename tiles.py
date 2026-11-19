@@ -70,7 +70,7 @@ TILE_DATA = {
     WATER: {
         "char": "~",
         "name": "Water",
-        "color": 6,
+        "color": 7,
         "walkable": False,
         "blocks_sight": False,
         "bump_msg": "The river current is too deep to cross.",
@@ -86,7 +86,7 @@ TILE_DATA = {
     HILL: {
         "char": "∩",
         "name": "Hill",
-        "color": 1,
+        "color": 9,
         "walkable": True,
         "blocks_sight": True,
         "enter_msg": "You climb into rolling hills.",
@@ -94,7 +94,7 @@ TILE_DATA = {
     SPIKE: {
         "char": "!",
         "name": "Spike",
-        "color": 4,
+        "color": 10,
         "walkable": True,
         "blocks_sight": False,
         "damage": 1,
