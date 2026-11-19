@@ -13,7 +13,7 @@ from render import draw_map, init_colors, draw_message_log
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld, find_open_floor
 from vision import get_visible_tiles
-from ui import show_text_panel, show_inventory_panel
+from ui import show_text_panel, show_inventory_panel, render_sidebar
 
 WORLD_WIDTH = 100
 WORLD_HEIGHT = 60
@@ -106,6 +106,10 @@ def main(stdscr):
             stdscr.getch()
             continue
 
+        # Reserve sidebar space
+        SIDEBAR_WIDTH = 26
+        MIN_MAP_WIDTH = 30
+
         view_height = max_y - MAP_TOP - MESSAGE_LOG_HEIGHT
         view_width = max_x - 1
 
@@ -162,6 +166,20 @@ def main(stdscr):
             }
         else:
             display_visible_tiles = natural_visible_tiles
+
+        visible_entities = [
+            e for e in entities
+            if (e["x"], e["y"] in visible_tiles and e["hp"] > )
+        ]
+
+        render_sidebar(
+            stdscr,
+            view_width,
+            max_y,
+            player,
+            biomes[player["y"]][player["x"]],
+            visible_entities
+        )
 
         # 1. Render System draws the whole grid with colors
         draw_map(

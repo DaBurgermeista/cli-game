@@ -45,6 +45,7 @@ def show_text_panel(stdscr, title, text):
     window.getch()
 
 def show_inventory_panel(stdscr, title, lines):
+
     max_y, max_x = stdscr.getmaxyx()
 
     # Keep a margin around the panel and ensure a usable minimum size.
@@ -77,3 +78,38 @@ def show_inventory_panel(stdscr, title, lines):
     if ord("1") <= key <= ord("9"):
         return key - ord("1")
     return None
+
+def render_sidebar(stdscr, start_x, max_y, player, biome_name, visible_entities):
+    panel_width = 25
+    stats = player.get("stats", {})
+    weapon = player["equipped_weapon"]["name"] if player["equipped_weapon"] else "Fists"
+
+    lines = [
+        f"=== {player['name']} ===",
+        f"HP:   {player['hp']}/{player['max_hp']}",
+        f"Wpn:  {weapon}",
+        f"Key:  {'Yes' if player['has_key'] else 'No'} | $: {player['money']}",
+        "",
+        "--- Location ---",
+        f"Biome: {biome_name.title()}",
+        f"Pos: {player['x']}, {player["y"]}",
+        "",
+        "--- Attributes ---",
+        f"STR: {stats.get('str', 1)}    INT: {stats.get('int', 1)}",
+        f"DEX: {stats.get('dex', 1)}    WIS: {stats.get('wis', 1)}",
+        f"CON: {stats.get('con', 1)}    LCK: {stats.get('luck', 1)}",
+        "",
+        "--- Nearby ---",
+    ]
+
+    if not visible_entities:
+        lines.append("None")
+    else:
+        for ent in visible_entities[:5]:
+            lines.append(f"{ent['char']} {ent['name']} ({ent['hp']}hp)")
+
+    for row_idx in range(max_y - 1):
+        if row_idx < max_y:
+            stdscr.addnstr(row_idx, start_x, "|", 1, curses.A_DIM)
+        if row_idx < len(lines):
+            stdscr.addnstr(row_idx, start_x + 2, lines[row_idx], panel_width - 2)
