@@ -34,7 +34,7 @@ def raise_hill(elevation, center_x, center_y, radius, peak_height):
                 continue
 
             height_range = peak_height - BASE_ELEVATION
-            distance = int(distance_squared ** 0.5)
+            distance = distance_squared ** 0.5
             height_loss = (distance * height_range) / radius
             tile_height = peak_height - height_loss
 
@@ -151,22 +151,6 @@ def create_elevation_map(width, height):
             start_y,
             segments=random.randint(3, 5),
             peak_height=random.randint(8, MAX_ELEVATION),
-        )
-
-    # Smaller number of high mountain regions.
-    for _ in range(3):
-        center_x = random.randint(width // 6, width - (width // 6) - 1)
-        center_y = random.randint(height // 6, height - (height // 6) - 1)
-
-        radius = random.randint(6, 12)
-        peak_height = random.randint(8, MAX_ELEVATION)
-
-        raise_hill(
-            elevation,
-            center_x,
-            center_y,
-            radius,
-            peak_height,
         )
 
     return elevation
