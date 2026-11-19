@@ -198,34 +198,51 @@ def stamp_lake(grid, center_x, center_y, radius):
     height = len(grid)
     width = len(grid[0])
 
+    # Most lakes are slightly wider or taller than they are round.
+    radius_x = max(2, radius + random.randint(-1, 2))
+    radius_y = max(2, radius + random.randint(-2, 1))
+
     water_tiles = []
 
     for y in range(
-        max(1, center_y - radius),
-        min(height - 1, center_y + radius + 1),
+        max(1, center_y - radius_y),
+        min(height - 1, center_y + radius_y + 1),
     ):
         for x in range(
-            max(1, center_x - radius),
-            min(width - 1, center_x + radius + 1),
+            max(1, center_x - radius_x),
+            min(width - 1, center_x + radius_x + 1),
         ):
-            distance_squared = (x - center_x) ** 2 + (y - center_y) ** 2
+            dx = x - center_x
+            dy = y - center_y
 
-            if distance_squared > radius ** 2:
+            # Ellipse distance:
+            # 0.0 = lake center
+            # 1.0 = normal shoreline
+            distance = (
+                (dx * dx) / (radius_x * radius_x)
+                + (dy * dy) / (radius_y * radius_y)
+            )
+
+            # Outside the lake boundary.
+            if distance > 1.0:
                 continue
 
-            # Leaves the shoreline a little irregular.
-            edge_chance = distance_squared / (radius ** 2)
-
-            if edge_chance > 0.65 and random.random() < 0.30:
-                continue
-
+            # Preserve important or impassable terrain.
             if grid[y][x] not in (FLOOR, BANK, WATER):
                 continue
+
+            # Keep the center solid; roughen only the outer shoreline.
+            if distance > 0.65:
+                edge_progress = (distance - 0.65) / 0.35
+
+                # More likely to omit tiles closer to the lake edge.
+                if random.random() < edge_progress * 0.55:
+                    continue
 
             grid[y][x] = WATER
             water_tiles.append((x, y))
 
-    # Add banks around the lake after placing water.
+    # Add banks around the finished water shape.
     for x, y in water_tiles:
         for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0)):
             nx = x + dx
@@ -237,6 +254,8 @@ def stamp_lake(grid, center_x, center_y, radius):
                 and grid[ny][nx] == FLOOR
             ):
                 grid[ny][nx] = BANK
+
+    return water_tiles
 
 def carve_river(grid, elevation, bridge_y=None):
     height = len(grid)
