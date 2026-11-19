@@ -215,6 +215,36 @@ def stamp_forest_near_water(grid, scale=0.02, clusters=4):
         start_y = wy + random.randint(-4, 4)
         stamp_blob(grid, start_x, start_y, TREE, scale=scale)
 
+def stamp_forest_patch(grid, center_x, center_y, radius):
+    height = len(grid)
+    width = len(grid[0])
+
+    for y in range(max(1, center_y - radius), min(height - 1, center_y + radius + 1)):
+        for x in range(max(1, center_x - radius), min(width - 1, center_x + radius + 1)):
+            distance = abs(x - center_x) + abs(y - center_y)
+
+            if distance > radius:
+                continue
+
+            # Dense center, irregular outer edge.
+            chance = 0.85 - (distance / (radius + 1)) * 0.45
+
+            if grid[y][x] == FLOOR and random.random() < chance:
+                grid[y][x] = TREE
+
+def scatter_rocks(grid, elevation, minimum_elevation=6, chance=0.08):
+    height = len(grid)
+    width = len(grid[0])
+
+    for y in range(1, height - 1):
+        for x in range(1, width - 1):
+            if (
+                elevation[y][x] >= minimum_elevation
+                and grid[y][x] == FLOOR
+                and random.random() < chance
+            ):
+                grid[y][x] = ROCK
+
 def stamp_building(grid, w=7, h=5, interior_item=None, is_ruin=False, biomes=None):
     height = len(grid)
     width = len(grid[0])
@@ -432,6 +462,7 @@ def generate_overworld(map_width, map_height, seed=None):
 
     apply_mountains(room, elevation)
     apply_hills(room, elevation)
+    scatter_rocks(room, elevation)
 
     # Put forests in by water
     for _ in range(4):
