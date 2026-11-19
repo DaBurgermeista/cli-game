@@ -76,7 +76,7 @@ TILE_DATA = {
         "bump_msg": "The river current is too deep to cross.",
     },
     MOUNTAIN: {
-        "char": "^",
+        "char": "▲",
         "name": "Mountain",
         "color": 1,
         "walkable": False,
@@ -84,7 +84,7 @@ TILE_DATA = {
         "bump_msg": "Steep mountains block your path.",
     },
     HILL: {
-        "char": "n",
+        "char": "∩",
         "name": "Hill",
         "color": 1,
         "walkable": True,
