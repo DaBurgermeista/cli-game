@@ -13,6 +13,7 @@ from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld
 from vision import get_visible_tiles
 from ui import show_text_panel, show_inventory_panel, render_sidebar
+from main_menu import show_main_menu
 
 WORLD_WIDTH = 100
 WORLD_HEIGHT = 60
@@ -75,6 +76,27 @@ def main(stdscr):
 
     debug_reveal_map = False
     debug_elevation = False
+
+    menu_choice = show_main_menu(stdscr)
+
+    if menu_choice == "Quit":
+        return
+    
+    if menu_choice == "Credits":
+        show_text_panel(
+            stdscr,
+            "Credits",
+            "Created by DaBurgermeista",
+        )
+        return
+    
+    if menu_choice == "Options":
+        show_text_panel(
+            stdscr,
+            "Options",
+            "Options are not implemented yet.",
+        )
+        return
 
     room, elevation, biomes, player_x, player_y = generate_overworld(
         WORLD_WIDTH,
