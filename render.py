@@ -127,6 +127,11 @@ def draw_map(
 
             attr = curses.color_pair(props["color"])
 
+            # Hills use the same highlands color as mountains,
+            # but appear subdued to show lower elevation.
+            if tile_id == HILL:
+                attr |= curses.A_DIM
+
             # Previously explored tiles remain visible but dim.
             if not is_visible:
                 attr |= curses.A_DIM

@@ -86,7 +86,7 @@ TILE_DATA = {
     HILL: {
         "char": "∩",
         "name": "Hill",
-        "color": 9,
+        "color": 1,
         "walkable": True,
         "blocks_sight": True,
         "enter_msg": "You climb into rolling hills.",
