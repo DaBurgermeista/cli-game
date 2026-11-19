@@ -98,7 +98,10 @@ def main(stdscr):
         took_turn = False
 
         max_y, max_x = stdscr.getmaxyx()
-    
+
+        # Reserve sidebar space
+        SIDEBAR_WIDTH = 30
+
         if max_y < 14 or max_x < 30:
             stdscr.erase()
             stdscr.addstr(0, 0, "Terminal too small. Resize it to continue.")
@@ -106,12 +109,9 @@ def main(stdscr):
             stdscr.getch()
             continue
 
-        # Reserve sidebar space
-        SIDEBAR_WIDTH = 26
-        MIN_MAP_WIDTH = 30
-
         view_height = max_y - MAP_TOP - MESSAGE_LOG_HEIGHT
-        view_width = max_x - 1
+        view_width = max_x - SIDEBAR_WIDTH
+        sidebar_x = view_width
 
         camera_x, camera_y = get_camera(
             player_x,
@@ -172,15 +172,6 @@ def main(stdscr):
             if (e["x"], e["y"] in visible_tiles and e["hp"] > 0)
         ]
 
-        render_sidebar(
-            stdscr,
-            view_width,
-            max_y,
-            player,
-            biomes[player["y"]][player["x"]],
-            visible_entities
-        )
-
         # 1. Render System draws the whole grid with colors
         draw_map(
             stdscr,
@@ -205,8 +196,18 @@ def main(stdscr):
             stdscr,
             messages,
             log_y,
-            max_x,
+            view_width,
             MESSAGE_LOG_HEIGHT,
+        )
+
+        render_sidebar(
+            stdscr,
+            player,
+            biomes[player["y"]][player["x"]],
+            visible_entities,
+            start_x=sidebar_x,
+            panel_width=SIDEBAR_WIDTH,
+            
         )
 
         stdscr.refresh()

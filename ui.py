@@ -79,7 +79,7 @@ def show_inventory_panel(stdscr, title, lines):
         return key - ord("1")
     return None
 
-def render_sidebar(stdscr, start_x, max_y, player, biome_name, visible_entities):
+def render_sidebar(stdscr, player, biome_name, visible_entities, start_x, panel_width):
     panel_width = 25
     stats = player.get("stats", {})
     weapon = player["equipped_weapon"]["name"] if player["equipped_weapon"] else "Fists"
