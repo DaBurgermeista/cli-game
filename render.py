@@ -50,10 +50,13 @@ def draw_message_log(stdscr, messages, start_y, width, height):
             text,
             width - 1,
         )
-
+        
 def get_elevation_attr(value):
+    if value <= 2:
+        return curses.color_pair(6)  # Blue: basin / lake level
+
     if value <= 4:
-        return curses.color_pair(2)  # Green: lowland / normal ground
+        return curses.color_pair(2)  # Green: lowland
 
     if value <= 6:
         return curses.color_pair(3)  # Yellow: hills
