@@ -466,7 +466,11 @@ def generate_overworld(map_width, map_height, seed=None):
 
     # Put forests in by water
     for _ in range(4):
-        stamp_forest_near_water(room, scale=0.05)
+        stamp_forest_near_water(
+            room,
+            scale=0.01,
+            clusters=2,
+        )
 
     # Add open-field texture
     for _ in range(8):
