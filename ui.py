@@ -110,14 +110,12 @@ def render_sidebar(stdscr, start_x, max_y, player, biome_name, visible_entities)
 
     max_y, max_x = stdscr.getmaxyx()
 
-    if start_x + 2 >= max_x - 1 or panel_width <= 2:
+    if start_x >= max_x - 1:
         return
     
     avail_width = min(panel_width - 2, max_x - (start_x + 2) - 1)
-    if avail_width <= 0:
-        return
 
-    if row_idx, line in enumerate(lines):
-        if row_idx >= max_y - 1:
-            break
-        stdscr.addnstr(row_idx, start_x+2, line, avail_width)
+    if row_idx in range(max_y - 1):
+        stdscr.addnstr(row_idx, start_x, "|", curses.A_DIM)
+        if row_idx < len(lines) and avail_width > 0:
+            stdscr.addnstr(row_idx, start_x+2, lines[row_idx], avail_width)
