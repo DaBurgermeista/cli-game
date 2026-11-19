@@ -446,7 +446,7 @@ def generate_overworld(map_width, map_height, seed=None):
         )
 
     elevation = create_elevation_map(map_width, map_height)
-    smooth_elevation(elevation, passes=2)
+    elevation = smooth_elevation(elevation, passes=2)
 
     room = create_overworld(map_width, map_height)
 
