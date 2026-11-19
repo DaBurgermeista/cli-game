@@ -123,19 +123,6 @@ def main(stdscr):
         )
 
         stdscr.erase()
-
-        # HUD Rendering
-        debug_label = ""
-
-        if debug_elevation:
-            debug_label = " | Elevation: On"
-
-        hud = (
-            f"Health: {player['hp']}/{player['max_hp']} | Key: {'Yes' if player['has_key'] else 'No'} "
-            f"| Pos: {player_x}, {player_y} | Biome: {biomes[player_y][player_x].title()}"
-            f"{debug_label}"
-        )
-        stdscr.addnstr(0, 0, hud, max_x - 1)
         
         visible_tiles = get_visible_tiles(room, player_x, player_y, radius=8)
 
@@ -169,7 +156,7 @@ def main(stdscr):
 
         visible_entities = [
             e for e in entities
-            if (e["x"], e["y"] in visible_tiles and e["hp"] > 0)
+            if (e["x"], e["y"]) in visible_tiles and e["hp"] > 0
         ]
 
         # 1. Render System draws the whole grid with colors
@@ -218,6 +205,7 @@ def main(stdscr):
             break        
         
         if key == ord("f"):
+            took_turn = False
             debug_reveal_map = not debug_reveal_map
             add_message(messages, (
                 "Debug map reveal enabled."
@@ -226,6 +214,7 @@ def main(stdscr):
             ))
             continue
         if key == ord("e"):
+            took_turn = False
             debug_elevation = not debug_elevation
 
             if debug_elevation:
@@ -246,6 +235,7 @@ def main(stdscr):
             took_turn = True
 
         if key == ord("i"):
+            took_turn = False
             if not player["inventory"]:
                 show_text_panel(stdscr, "Inventory", "Your pack is empty.")
             else:
@@ -259,13 +249,17 @@ def main(stdscr):
 
         if key in (ord("w"), curses.KEY_UP):
             next_y -= 1
+            took_turn = True
         elif key in (ord("s"), curses.KEY_DOWN):
             next_y += 1
+            took_turn = True
         elif key in (ord("a"), curses.KEY_LEFT):
             next_x -= 1
+            took_turn = True
         elif key in (ord("d"), curses.KEY_RIGHT):
             next_x += 1
-        took_turn = True
+            took_turn = True
+        
 
         # 3. Movement System checks TILE_DATA
         if (next_x, next_y) != (player_x, player_y):
