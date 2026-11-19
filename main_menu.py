@@ -156,20 +156,3 @@ def show_main_menu(stdscr):
 
         elif key in (ord("q"), 27):
             return "Quit"
-
-if __name__ == "__main__":
-    def test_menu(stdscr):
-        curses.curs_set(0)
-        curses.start_color()
-        curses.use_default_colors()
-        curses.init_pair(5, curses.COLOR_CYAN, -1)
-
-        choice = show_main_menu(stdscr)
-
-        stdscr.erase()
-        stdscr.addstr(2, 2, f"You selected: {choice}")
-        stdscr.addstr(4, 2, "Press any key to exit.")
-        stdscr.refresh()
-        stdscr.getch()
-
-    curses.wrapper(test_menu)
