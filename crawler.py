@@ -290,38 +290,38 @@ def main(stdscr):
                 )
 
         # 4. Interaction System reads flags from TILE_DATA
-        current_tile = room[player_y][player_x]
-        props = TILE_DATA[current_tile]
-        ground_item = get_item_at(items, player_x, player_y)
-
-        if ground_item is not None:
-            add_message(messages, f"You see a {ground_item['name']} here.")
-        
-        if props.get("pickup")  == "key":
-            add_message(messages, "You found a key.")
-            player["has_key"] = True
-            room[player_y][player_x] = FLOOR
-        
-        if props.get("need_key"):
-            room[player_y][player_x] = FLOOR
-            add_message(messages, "You unlocked the door!")
-        
-        if "damage" in props:
-            player["hp"] = max(0, player["hp"] - props["damage"])
-            add_message(messages, f"Ouch! You took {props['damage']} damage! from a {props['name']}!")
-            if player["hp"] <= 0:
-                break
-        
-        if "text" in props:
-            show_text_panel(stdscr, props["name"], props["text"])
-
-        if props.get("exit"):
-            show_text_panel(stdscr, "Victory!", "Good Job! You found the super easy to get to exit!\n")
-            break
-        
         if took_turn:
+            current_tile = room[player_y][player_x]
+            props = TILE_DATA[current_tile]
+            ground_item = get_item_at(items, player_x, player_y)
+
+            if ground_item is not None:
+                add_message(messages, f"You see a {ground_item['name']} here.")
+            
+            if props.get("pickup")  == "key":
+                add_message(messages, "You found a key.")
+                player["has_key"] = True
+                room[player_y][player_x] = FLOOR
+            
+            if props.get("need_key"):
+                room[player_y][player_x] = FLOOR
+                add_message(messages, "You unlocked the door!")
+            
+            if "damage" in props:
+                player["hp"] = max(0, player["hp"] - props["damage"])
+                add_message(messages, f"Ouch! You took {props['damage']} damage! from a {props['name']}!")
+                if player["hp"] <= 0:
+                    break
+            
+            if "text" in props:
+                show_text_panel(stdscr, props["name"], props["text"])
+
             for msg in update_entities(entities, room, player):
                 add_message(messages, msg)
+                
+            if props.get("exit"):
+                show_text_panel(stdscr, "Victory!", "Good Job! You found the super easy to get to exit!\n")
+                break
 
             if player["hp"] <= 0:
                 show_text_panel(stdscr, "Defeated!", "You died")
