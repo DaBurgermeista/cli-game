@@ -169,7 +169,7 @@ def main(stdscr):
 
         visible_entities = [
             e for e in entities
-            if (e["x"], e["y"] in visible_tiles and e["hp"] > )
+            if (e["x"], e["y"] in visible_tiles and e["hp"] > 0)
         ]
 
         render_sidebar(
