@@ -40,6 +40,33 @@ def raise_hill(elevation, center_x, center_y, radius, peak_height):
 
             elevation[y][x] = max(elevation[y][x], tile_height)
 
+def lower_basin(elevation, center_x, center_y, radius, depth):
+    height = len(elevation)
+    width = len(elevation[0])
+
+    for y in range(
+        max(1, center_y - radius),
+        min(height - 1, center_y + radius + 1),
+    ):
+        for x in range(
+            max(1, center_x - radius),
+            min(width - 1, center_x + radius + 1),
+        ):
+            distance_squared = (x - center_x) ** 2 + (y - center_y) ** 2
+
+            if distance_squared > radius ** 2:
+                continue
+
+            distance = distance_squared ** 0.5
+            falloff = 1 - (distance / radius)
+
+            lowering = round(depth * falloff)
+
+            elevation[y][x] = max(
+                0,
+                elevation[y][x] - lowering,
+            )
+
 def create_elevation_map(width, height):
     elevation = [
         [BASE_ELEVATION for _ in range(width)]
@@ -153,6 +180,50 @@ def stamp_blob(grid, center_x, center_y, tile_type, scale=0.04, replaceable_tile
         dx, dy = random.choice([(0, -1), (0, 1), (1, 0), (-1, 0)])
         fx += dx
         fy += dy
+
+def stamp_lake(grid, center_x, center_y, radius):
+    height = len(grid)
+    width = len(grid[0])
+
+    water_tiles = []
+
+    for y in range(
+        max(1, center_y - radius),
+        min(height - 1, center_y + radius + 1),
+    ):
+        for x in range(
+            max(1, center_x - radius),
+            min(width - 1, center_x + radius + 1),
+        ):
+            distance_squared = (x - center_x) ** 2 + (y - center_y) ** 2
+
+            if distance_squared > radius ** 2:
+                continue
+
+            # Leaves the shoreline a little irregular.
+            edge_chance = distance_squared / (radius ** 2)
+
+            if edge_chance > 0.65 and random.random() < 0.30:
+                continue
+
+            if grid[y][x] not in (FLOOR, BANK, WATER):
+                continue
+
+            grid[y][x] = WATER
+            water_tiles.append((x, y))
+
+    # Add banks around the lake after placing water.
+    for x, y in water_tiles:
+        for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0)):
+            nx = x + dx
+            ny = y + dy
+
+            if (
+                1 <= nx < width - 1
+                and 1 <= ny < height - 1
+                and grid[ny][nx] == FLOOR
+            ):
+                grid[ny][nx] = BANK
 
 def carve_river(grid, elevation, bridge_y=None):
     height = len(grid)
@@ -491,6 +562,19 @@ def generate_overworld(map_width, map_height, seed=None):
     elevation = create_elevation_map(map_width, map_height)
     elevation = smooth_elevation(elevation, passes=2)
 
+    # Add basins after smoothing so they remain distinct.
+    for _ in range(2):
+        basin_x = random.randint(map_width // 5, map_width - (map_width // 5) - 1)
+        basin_y = random.randint(map_height // 4, map_height - (map_height // 4) - 1)
+
+        lower_basin(
+            elevation,
+            basin_x,
+            basin_y,
+            radius=random.randint(4, 7),
+            depth=random.randint(1, 2),
+        )
+
     room = create_overworld(map_width, map_height)
 
     # Generate Water Features first
@@ -499,9 +583,15 @@ def generate_overworld(map_width, map_height, seed=None):
 
     ## Stamp Lakes
     for _ in range(3):
-        lake_x = random.randint(5, map_width - 6)
-        lake_y = random.randint(4, map_height - 5)
-        stamp_blob(room, lake_x, lake_y, WATER, scale=0.04)
+        lake_x = random.randint(6, map_width - 7)
+        lake_y = random.randint(6, map_height - 7)
+
+        stamp_lake(
+            room,
+            lake_x,
+            lake_y,
+            radius=random.randint(3, 6),
+        )
 
     apply_mountains(room, elevation)
     apply_hills(room, elevation)
