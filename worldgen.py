@@ -575,17 +575,23 @@ def generate_overworld(map_width, map_height, seed=None):
     elevation = create_elevation_map(map_width, map_height)
     elevation = smooth_elevation(elevation, passes=2)
 
-    # Add basins after smoothing so they remain distinct.
+    # Add basins after smoothing so their low elevations remain visible.
     for _ in range(2):
-        basin_x = random.randint(map_width // 5, map_width - (map_width // 5) - 1)
-        basin_y = random.randint(map_height // 4, map_height - (map_height // 4) - 1)
+        basin_x = random.randint(
+            map_width // 5,
+            map_width - (map_width // 5) - 1,
+        )
+        basin_y = random.randint(
+            map_height // 4,
+            map_height - (map_height // 4) - 1,
+        )
 
         lower_basin(
             elevation,
             basin_x,
             basin_y,
             radius=random.randint(4, 7),
-            depth=random.randint(1, 2),
+            floor_elevation=random.choice([1, 2]),
         )
 
     room = create_overworld(map_width, map_height)
