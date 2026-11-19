@@ -40,6 +40,38 @@ def raise_hill(elevation, center_x, center_y, radius, peak_height):
 
             elevation[y][x] = max(elevation[y][x], tile_height)
 
+def raise_mountain_range(
+    elevation,
+    start_x,
+    start_y,
+    segments,
+    peak_height=9,
+):
+    height = len(elevation)
+    width = len(elevation[0])
+
+    x = start_x
+    y = start_y
+
+    # A range has an overall direction, with small random deviations.
+    direction_x, direction_y = random.choice([
+        (1, 0),    # East-west
+        (0, 1),    # North-south
+        (1, 1),    # Southeast
+        (1, -1),   # Northeast
+        (-1, 1),   # Southwest
+        (-1, -1),  # Northwest
+    ])
+
+    for _ in range(segments):
+        radius = random.randint(4, 7)
+
+        # Slight peak variation avoids identical mountain domes.
+        local_peak = max(
+            8,
+            min(
+         
+
 def lower_basin(
     elevation,
     center_x,
@@ -86,20 +118,17 @@ def create_elevation_map(width, height):
         for _ in range(height)
     ]
 
-    # Broad rolling hills. These shape terrain but do not create mountains.
-    for _ in range(5):
-        center_x = random.randint(width // 8, width - (width // 8) - 1)
-        center_y = random.randint(height // 8, height - (height // 8) - 1)
+    # A few connected mountain ranges rather than isolated round peaks.
+    for _ in range(2):
+        start_x = random.randint(width // 3, (width * 2) // 3)
+        start_y = random.randint(height // 3, (height * 2) // 3)
 
-        radius = random.randint(8, 16)
-        peak_height = random.randint(5, 7)
-
-        raise_hill(
+        raise_mountain_range(
             elevation,
-            center_x,
-            center_y,
-            radius,
-            peak_height,
+            start_x,
+            start_y,
+            segments=random.randint(3, 5),
+            peak_height=random.randint(8, MAX_ELEVATION),
         )
 
     # Smaller number of high mountain regions.
