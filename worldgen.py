@@ -35,7 +35,7 @@ def raise_hill(elevation, center_x, center_y, radius, peak_height):
 
             height_range = peak_height - BASE_ELEVATION
             distance = int(distance_squared ** 0.5)
-            height_loss = (distance * height_range) // radius
+            height_loss = (distance * height_range) / radius
             tile_height = peak_height - height_loss
 
             elevation[y][x] = max(elevation[y][x], tile_height)
@@ -188,7 +188,7 @@ def smooth_elevation(elevation, passes=2):
                     elevation[y][x],
                 ]
 
-                result[y][x] = round(sum(neighbors) / len(neighbors))
+                result[y][x] = sum(neighbors) / len(neighbors)
 
         elevation = result
 
@@ -200,8 +200,19 @@ def apply_mountains(grid, elevation, mountain_height=8):
 
     for y in range(1, height - 1):
         for x in range(1, width - 1):
-            # Only high elevation floors become mountains
-            if elevation[y][x] >= mountain_height and grid[y][x] == FLOOR:
+            if grid[y][x] != FLOOR:
+                continue
+
+            elevation_value = elevation[y][x]
+
+            if elevation_value < mountain_height:
+                continue
+
+            # Highest peaks always become mountains.
+            # Borderline elevations become irregular mountain edges.
+            if elevation_value >= mountain_height + 0.7:
+                grid[y][x] = MOUNTAIN
+            elif random.random() < 0.60:
                 grid[y][x] = MOUNTAIN
 
 def apply_hills(grid, elevation, hill_height=7):

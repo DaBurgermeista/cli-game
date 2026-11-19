@@ -50,7 +50,7 @@ def draw_message_log(stdscr, messages, start_y, width, height):
             text,
             width - 1,
         )
-        
+
 def get_elevation_attr(value):
     if value <= 2:
         return curses.color_pair(6)  # Blue: basin / lake level
@@ -103,12 +103,13 @@ def draw_map(
             # Elevation debug mode replaces terrain with elevation digits.
             if show_elevation and elevation is not None:
                 elevation_value = elevation[world_y][world_x]
+                display_value = round(elevation_value)
 
                 safe_addch(
                     stdscr,
                     screen_y + 2,
                     screen_x,
-                    str(elevation_value),
+                    str(display_value),
                     get_elevation_attr(elevation_value),
                 )
 
