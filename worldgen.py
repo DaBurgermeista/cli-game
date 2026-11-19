@@ -700,8 +700,8 @@ def generate_overworld(map_width, map_height, seed=None):
             radius=max(3, basin_radius - 1),
         )
 
-    apply_mountains(room, elevation)
-    apply_hills(room, elevation)
+    apply_mountains(room, elevation, mountain_height=7.4)
+    apply_hills(room, elevation, hill_height=6.2)
     scatter_rocks(room, elevation)
 
     # Put forests in by water
