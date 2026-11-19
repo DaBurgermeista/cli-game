@@ -19,6 +19,8 @@ from tiles import (
 
 BASE_ELEVATION = 3
 MAX_ELEVATION = 9
+MIN_WORLD_WIDTH = 30
+MIN_WORLD_HEIGHT = 20
 
 def raise_hill(elevation, center_x, center_y, radius, peak_height):
     height = len(elevation)
@@ -379,6 +381,12 @@ def create_biome_map(grid, elevation):
 def generate_overworld(map_width, map_height, seed=None):
     if seed is not None:
         random.seed(seed)
+    
+    if map_width < MIN_WORLD_WIDTH or map_height < MIN_WORLD_HEIGHT:
+        raise ValueError(
+            f"Map must be at least "
+            f"{MIN_WORLD_WIDTH}x{MIN_WORLD_HEIGHT}."
+        )
 
     elevation = create_elevation_map(map_width, map_height)
     room = create_overworld(map_width, map_height)
