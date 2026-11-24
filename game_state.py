@@ -189,6 +189,14 @@ def create_game_state(
                 den_entity["hp"] += floor_number - 1
             entities.append(den_entity)
 
+    # The training room gets its dummies: leashed to their own tile so
+    # they never move, and never hostile so they never fight back.
+    if pois is not None and "training" in pois:
+        for spawn_x, spawn_y in pois["training"]["spawns"]:
+            dummy = create_entity("training_dummy", spawn_x, spawn_y)
+            dummy["leash"] = [spawn_x, spawn_y, spawn_x, spawn_y]
+            entities.append(dummy)
+
     # Place items after entities and exclude their occupied positions too.
     occupied_tiles = {start} | {
         (entity["x"], entity["y"]) for entity in entities

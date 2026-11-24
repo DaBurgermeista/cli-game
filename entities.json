@@ -7,7 +7,8 @@
         "attack": 1,
         "hostile": true,
         "spawn_weight": 5,
-        "biomes": ["forest", "highlands", "ruins"]
+        "biomes": ["forest", "highlands", "ruins"],
+        "xp": 15
     },
     "deer": {
         "name": "Dungeon Rat",
@@ -17,7 +18,8 @@
         "attack": 1,
         "hostile": false,
         "spawn_weight": 8,
-        "biomes": ["forest", "plains", "meadow", "ruins"]
+        "biomes": ["forest", "plains", "meadow", "ruins"],
+        "xp": 10
     },
     "troll": {
         "name": "Cave Troll",
@@ -26,7 +28,8 @@
         "hp": 6,
         "hostile": true,
         "spawn_weight": 1,
-        "biomes": ["ruins", "highlands"]
+        "biomes": ["ruins", "highlands"],
+        "xp": 30
     },
     "beaver": {
         "name": "Sewer Lurker",
@@ -36,7 +39,8 @@
         "attack": 1,
         "hostile": false,
         "spawn_weight": 3,
-        "biomes": ["riverbank", "water", "ruins"]
+        "biomes": ["riverbank", "water", "ruins"],
+        "xp": 5
     },
     "boar": {
         "name": "Spiked Boar",
@@ -46,7 +50,8 @@
         "attack": 1,
         "hostile": true,
         "spawn_weight": 4,
-        "biomes": ["forest", "meadow", "ruins"]
+        "biomes": ["forest", "meadow", "ruins"],
+        "xp": 20
     },
     "bandit": {
         "name": "Dungeon Looter",
@@ -56,7 +61,8 @@
         "attack": 1,
         "hostile": true,
         "spawn_weight": 3,
-        "biomes": ["camp", "ruins", "plains"]
+        "biomes": ["camp", "ruins", "plains"],
+        "xp": 20
     },
     "snake": {
         "name": "Cave Viper",
@@ -66,7 +72,8 @@
         "attack": 1,
         "hostile": true,
         "spawn_weight": 4,
-        "biomes": ["riverbank", "water", "meadow", "ruins"]
+        "biomes": ["riverbank", "water", "meadow", "ruins"],
+        "xp": 10
     },
     "goat": {
         "name": "Cave Goat",
@@ -76,7 +83,8 @@
         "attack": 1,
         "hostile": false,
         "spawn_weight": 6,
-        "biomes": ["highlands", "ruins"]
+        "biomes": ["highlands", "ruins"],
+        "xp": 5
     },
     "floor_boss": {
         "name": "Grum, Goblin Warlord",
@@ -88,7 +96,8 @@
         "spawn_weight": 0,
         "biomes": ["ruins"],
         "boss": true,
-        "boss_tier": "floor"
+        "boss_tier": "floor",
+        "xp": 100
     },
     "borough_boss": {
         "name": "Mog, Ogre Borough Boss",
@@ -100,7 +109,8 @@
         "spawn_weight": 0,
         "biomes": ["ruins"],
         "boss": true,
-        "boss_tier": "borough"
+        "boss_tier": "borough",
+        "xp": 200
     },
     "district_boss": {
         "name": "Vex, District Overlord",
@@ -112,7 +122,8 @@
         "spawn_weight": 0,
         "biomes": ["ruins"],
         "boss": true,
-        "boss_tier": "district"
+        "boss_tier": "district",
+        "xp": 400
     },
     "city_boss": {
         "name": "The City Boss",
@@ -124,7 +135,8 @@
         "spawn_weight": 0,
         "biomes": ["ruins"],
         "boss": true,
-        "boss_tier": "city"
+        "boss_tier": "city",
+        "xp": 800
     },
     "wisp": {
         "name": "Dungeon Wisp",
@@ -134,6 +146,18 @@
         "attack": 1,
         "hostile": false,
         "spawn_weight": 2,
-        "biomes": ["shrine", "forest", "ruins"]
+        "biomes": ["shrine", "forest", "ruins"],
+        "xp": 10
+    },
+    "training_dummy": {
+        "name": "Training Dummy",
+        "char": "D",
+        "color": 3,
+        "hp": 30,
+        "attack": 0,
+        "hostile": false,
+        "spawn_weight": 0,
+        "biomes": ["ruins"],
+        "xp": 0
     }
 }

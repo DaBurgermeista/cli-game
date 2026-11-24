@@ -144,10 +144,21 @@ def render_sidebar(
     panel_width = 25
     stats = player.get("stats", {})
     weapon = player["equipped_weapon"]["name"] if player["equipped_weapon"] else "Fists"
+    level = player.get("level", 1)
+    skills = player.get("skills") or {}
+
+    def _skill_line(name):
+        skill = skills.get(name.lower(), {"level": 1, "xp": 0})
+        skill_level = skill.get("level", 1)
+        return (
+            f"{name} {skill_level} "
+            f"({skill.get('xp', 0)}/{5 * skill_level})"
+        )
 
     lines = [
         f"=== {player['name']} ===",
         f"HP:   {player['hp']}/{player['max_hp']}",
+        f"Lvl:  {level} | XP: {player.get('xp', 0)}/{100 * level}",
         f"Wpn:  {weapon}",
         f"Key:  {'Yes' if player['has_key'] else 'No'} | Gold: {player['money']}",
         f"Pack: {len(player['inventory'])}/{PACK_CAPACITY}",
@@ -160,6 +171,11 @@ def render_sidebar(
         f"STR: {stats.get('str', 1)}    INT: {stats.get('int', 1)}",
         f"DEX: {stats.get('dex', 1)}    WIS: {stats.get('wis', 1)}",
         f"CON: {stats.get('con', 1)}    LCK: {stats.get('luck', 1)}",
+        "",
+        "--- Skills ---",
+        _skill_line("Unarmed"),
+        _skill_line("Blades"),
+        _skill_line("Spears"),
         "",
         "--- Nearby ---",
     ]

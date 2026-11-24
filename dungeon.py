@@ -216,7 +216,7 @@ def generate_dungeon(width, height, seed=None):
     pois = {}
     poi_rooms = [room for room in rooms[1:] if room != boss_room]
     rng.shuffle(poi_rooms)
-    poi_types = ["vault", "trap", "safe", "den"]
+    poi_types = ["vault", "trap", "safe", "den", "training"]
     rng.shuffle(poi_types)
     for room, poi_type in zip(poi_rooms[:2], poi_types[:2]):
         if poi_type == "vault":
@@ -274,6 +274,14 @@ def generate_dungeon(width, height, seed=None):
             center_y = room[1] + room[3] // 2
             grid[center_y][center_x] = CAMPFIRE
             pois["safe"] = {"room": room, "fire": (center_x, center_y)}
+        elif poi_type == "training":
+            # A quiet room with two dummies: a safe place to practice a
+            # weapon style. Dummies never fight back, move, or drop loot.
+            interior = _interior_tiles(grid, room)
+            if len(interior) < 2:
+                continue
+            spawn_spots = rng.sample(interior, 2)
+            pois["training"] = {"room": room, "spawns": spawn_spots}
         elif poi_type == "den":
             interior = _interior_tiles(grid, room)
             if len(interior) < 4:
