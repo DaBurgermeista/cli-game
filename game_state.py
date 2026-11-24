@@ -6,8 +6,10 @@ output into the shared state used by the action layer and the curses display.
 
 from dataclasses import dataclass
 
-from entities import create_entity, create_player, spawn_random_entities
-from items import spawn_random_items
+import random
+
+from entities import ENTITY_DATA, create_entity, create_player, spawn_random_entities
+from items import create_item, spawn_random_items
 from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld
 
@@ -56,6 +58,8 @@ class GameState:
     boss_room: tuple | None = None
     boss: dict | None = None
     boss_announced: bool = False
+    pois: dict | None = None
+    rested: bool = False
 
 
 def create_game_state(
@@ -87,10 +91,11 @@ def create_game_state(
         height,
         seed=seed,
     )
-    # Dungeon generators add the boss room as a sixth element; the
-    # overworld returns five parts and has no boss room.
+    # Dungeon generators add the boss room as a sixth element and a POI
+    # dict as a seventh; the overworld returns five parts and has neither.
     grid, elevation, regions, player_x, player_y = generated[:5]
     boss_room = generated[5] if len(generated) > 5 else None
+    pois = generated[6] if len(generated) > 6 else None
 
     start = (player_x, player_y)
     if player is None:
@@ -116,6 +121,17 @@ def create_game_state(
             for y in range(boss_y, boss_y + boss_h)
             for x in range(boss_x, boss_x + boss_w)
         }
+    if pois:
+        # POI rooms are staged by the generator: keep random spawns out
+        # so the vault stays sealed, the gauntlet stays a gauntlet, the
+        # safe room stays safe, and the den keeps its own pack.
+        for poi in pois.values():
+            poi_x, poi_y, poi_w, poi_h = poi["room"]
+            reserved_tiles |= {
+                (x, y)
+                for y in range(poi_y, poi_y + poi_h)
+                for x in range(poi_x, poi_x + poi_w)
+            }
     # Entities and items use the generator's region labels to choose matching
     # entries from entities.json and items.json.
     entity_tiles = get_walkable_tiles(grid, exclude=reserved_tiles)
@@ -155,6 +171,24 @@ def create_game_state(
             ]
             entities.append(boss)
 
+    # The monster den gets its own pack: three hostile dungeon creatures
+    # placed on the generator's spawn spots, scaled like other floor mobs.
+    if pois is not None and "den" in pois:
+        den_kinds = [
+            kind
+            for kind, data in ENTITY_DATA.items()
+            if data.get("hostile", False)
+            and not data.get("boss", False)
+            and "ruins" in data.get("biomes", [])
+        ]
+        den_weights = [ENTITY_DATA[k].get("spawn_weight", 1) for k in den_kinds]
+        for spawn_x, spawn_y in pois["den"]["spawns"]:
+            den_kind = random.choices(den_kinds, weights=den_weights, k=1)[0]
+            den_entity = create_entity(den_kind, spawn_x, spawn_y)
+            if floor_number > 1:
+                den_entity["hp"] += floor_number - 1
+            entities.append(den_entity)
+
     # Place items after entities and exclude their occupied positions too.
     occupied_tiles = {start} | {
         (entity["x"], entity["y"]) for entity in entities
@@ -169,6 +203,12 @@ def create_game_state(
         item_tiles,
         count=item_count,
     )
+    if pois:
+        # POI loot is staged by the generator: vault boxes behind the
+        # locked door, the gauntlet's prize, the den's guarded box.
+        for poi in pois.values():
+            for loot_x, loot_y, loot_kind in poi.get("loot", []):
+                items.append(create_item(loot_kind, loot_x, loot_y))
 
     return GameState(
         grid=grid,
@@ -186,4 +226,5 @@ def create_game_state(
         floor_number=floor_number,
         boss_room=boss_room,
         boss=boss,
+        pois=pois,
     )

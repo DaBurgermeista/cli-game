@@ -19,7 +19,7 @@ from items import (
     open_loot_box,
     use_item,
 )
-from tiles import FLOOR, TILE_DATA
+from tiles import CAMPFIRE, FLOOR, TILE_DATA
 
 
 class ActionType(Enum):
@@ -234,7 +234,7 @@ def apply_action(game, action, message_limit=4):
         _add_message(game, f"You see a {ground_item['name']} here.", message_limit)
 
     if props.get("pickup") == "key":
-        _add_message(game, "You found a boss key.", message_limit)
+        _add_message(game, "You found a key.", message_limit)
         player["has_key"] = True
         game.grid[player["y"]][player["x"]] = FLOOR
         props = TILE_DATA[FLOOR]
@@ -248,6 +248,17 @@ def apply_action(game, action, message_limit=4):
         )
         if player["hp"] <= 0:
             result.outcome = "defeat"
+
+    if current_tile == CAMPFIRE and not getattr(game, "rested", False):
+        if player["hp"] < player["max_hp"]:
+            healed = min(3, player["max_hp"] - player["hp"])
+            player["hp"] += healed
+            game.rested = True
+            _add_message(
+                game,
+                f"You rest by the fire and recover {healed} HP.",
+                message_limit,
+            )
 
     if props.get("exit") and _living_boss(game) is None:
         result.outcome = "victory"
