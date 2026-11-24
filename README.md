@@ -6,7 +6,8 @@ Early Python/curses exploration-game prototype, themed on Dungeon Crawler Carl.
 
 - `W`, `A`, `S`, `D` or arrow keys: move
 - `G`: pick up the item under you
-- `I`: open inventory and select an item with `1`-`9`
+- `I`: open inventory (arrows/W/S to select, Enter to use, `D` to drop, Esc to close)
+- `H`: quick-heal with the first healing item
 - `.`: wait one turn
 - `F`: toggle full-map debug reveal
 - `E`: toggle elevation debug view

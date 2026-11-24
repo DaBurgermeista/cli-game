@@ -1,6 +1,8 @@
 import curses
 import textwrap
 
+from items import PACK_CAPACITY, format_inventory, item_detail
+
 
 def show_text_panel(stdscr, title, text):
     max_y, max_x = stdscr.getmaxyx()
@@ -44,40 +46,80 @@ def show_text_panel(stdscr, title, text):
     window.refresh()
     window.getch()
 
-def show_inventory_panel(stdscr, title, lines):
+def show_inventory_panel(stdscr, title, player):
+    """Navigable inventory panel.
 
+    Arrow keys (or W/S) move the selection, Enter uses the selected item,
+    D drops one of it, number keys are a shortcut to use a slot, and
+    Esc/Q closes without doing anything.
+
+    Returns ("use", index), ("drop", index), or None when closed.
+    """
     max_y, max_x = stdscr.getmaxyx()
 
     # Keep a margin around the panel and ensure a usable minimum size.
     box_width = min(70, max_x - 4)
-    box_height = min(16, max_y - 4)
+    box_height = min(18, max_y - 4)
 
-    if box_width < 20 or box_height < 8:
-        return
+    if box_width < 20 or box_height < 10:
+        return None
 
     start_y = (max_y - box_height) // 2
     start_x = (max_x - box_width) // 2
+    text_width = box_width - 4
 
     window = curses.newwin(box_height, box_width, start_y, start_x)
-    window.box()
+    selected = 0
 
-    # Interior width: borders plus a one-character margin on both sides.
-    text_width = box_width - 4 
+    while True:
+        lines = format_inventory(player)
+        if not lines:
+            return None
+        selected = max(0, min(selected, len(lines) - 1))
 
-    window.addnstr(1, 2, title, text_width, curses.A_BOLD)
+        window.erase()
+        window.box()
+        window.addnstr(1, 2, title, text_width, curses.A_BOLD)
 
-    available_lines = box_height - 5
-    for index, line in enumerate(lines[:available_lines]):
-        window.addnstr(index + 3, 2, line, text_width)
+        # Leave room for the title, the detail lines, and the prompt.
+        available_lines = box_height - 8
+        top = 0
+        if selected >= top + available_lines:
+            top = selected - available_lines + 1
+        for row, line in enumerate(lines[top:top + available_lines]):
+            index = top + row
+            attr = curses.A_REVERSE if index == selected else 0
+            window.addnstr(row + 3, 2, line, text_width, attr)
 
-    prompt = "Press 1-9 to use item, or any other key to close"
-    prompt_x = max(2, (box_width - len(prompt)) // 2)
-    window.addnstr(box_height - 2, prompt_x, prompt, text_width, curses.A_DIM)
+        detail = item_detail(player["inventory"][selected], player)
+        detail_lines = textwrap.wrap(detail, width=text_width)[:2]
+        detail_y = box_height - 4
+        window.hline(detail_y - 1, 1, curses.ACS_HLINE, box_width - 2)
+        for offset, detail_line in enumerate(detail_lines):
+            window.addnstr(detail_y + offset, 2, detail_line, text_width, curses.A_DIM)
 
-    key = window.getch()
-    if ord("1") <= key <= ord("9"):
-        return key - ord("1")
-    return None
+        prompt = "Up/Down select | Enter use | D drop | 1-9 use | Esc close"
+        prompt_x = max(2, (box_width - len(prompt)) // 2)
+        window.addnstr(box_height - 2, prompt_x, prompt, text_width, curses.A_DIM)
+
+        window.refresh()
+        key = window.getch()
+
+        if key in (curses.KEY_UP, ord("w")):
+            selected = max(0, selected - 1)
+        elif key in (curses.KEY_DOWN, ord("s")):
+            selected = min(len(lines) - 1, selected + 1)
+        elif key in (10, 13, curses.KEY_ENTER):
+            return ("use", selected)
+        elif key == ord("d"):
+            return ("drop", selected)
+        elif ord("1") <= key <= ord("9"):
+            index = key - ord("1")
+            if index < len(lines):
+                return ("use", index)
+        elif key in (27, ord("q")):
+            return None
+
 
 def render_sidebar(
     stdscr,
@@ -103,6 +145,7 @@ def render_sidebar(
         f"HP:   {player['hp']}/{player['max_hp']}",
         f"Wpn:  {weapon}",
         f"Key:  {'Yes' if player['has_key'] else 'No'} | Gold: {player['money']}",
+        f"Pack: {len(player['inventory'])}/{PACK_CAPACITY}",
         "",
         "--- Location ---",
         f"{area_label}: {area_name.title()}",

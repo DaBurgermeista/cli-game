@@ -2,7 +2,6 @@
 
 import curses
 
-from items import format_inventory
 from render import draw_map, init_colors, draw_message_log
 from vision import get_visible_tiles
 from ui import show_text_panel, show_inventory_panel, render_sidebar
@@ -242,17 +241,33 @@ def main(stdscr):
         if key == ord("i"):
             if not player["inventory"]:
                 show_text_panel(stdscr, "Inventory", "Your pack is empty.")
-            else:
-                choice = show_inventory_panel(
-                    stdscr,
-                    "Inventory",
-                    format_inventory(player),
-                )
-                if choice is None:
-                    continue
-                action = GameAction(ActionType.USE_ITEM, item_index=choice)
-            if not player["inventory"]:
                 continue
+            choice = show_inventory_panel(stdscr, "Inventory", player)
+            if choice is None:
+                continue
+            verb, item_index = choice
+            if verb == "use":
+                action = GameAction(ActionType.USE_ITEM, item_index=item_index)
+            else:
+                action = GameAction(ActionType.DROP_ITEM, item_index=item_index)
+        # H is a quick heal: drink the first healing item without opening
+        # the panel. It costs a turn, like using it from the panel.
+        elif key == ord("h"):
+            heal_index = next(
+                (
+                    idx
+                    for idx, item in enumerate(player["inventory"])
+                    if item["type"] == "heal"
+                ),
+                None,
+            )
+            if heal_index is None:
+                add_message(messages, "You have no healing items.")
+                continue
+            if player["hp"] >= player["max_hp"]:
+                add_message(messages, "You are already at full health.")
+                continue
+            action = GameAction(ActionType.USE_ITEM, item_index=heal_index)
         # Convert terminal keys into game-level actions. The rules module
         # handles movement, combat, pickup, effects, and enemy turns.
         elif key in (ord("w"), curses.KEY_UP):
