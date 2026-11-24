@@ -42,6 +42,8 @@ def create_item(kind, x, y):
     if template["type"] == "loot_box":
         item["rolls"] = template.get("rolls", 1)
         item["guarantee"] = template.get("guarantee")
+    if template["type"] == "weapon":
+        item["skill"] = template.get("skill", "unarmed")
     return item
 
 

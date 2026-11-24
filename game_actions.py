@@ -8,7 +8,7 @@ import random
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
-from entities import attack_entity, get_entity_at, update_entities
+from entities import attack_entity, get_entity_at, update_entities, weapon_skill
 from items import (
     ENEMY_LOOT_DROP_CHANCE,
     ENEMY_LOOT_DROP_WEIGHTS,
@@ -70,6 +70,60 @@ def _living_boss(game):
     return boss
 
 
+# XP needed to go from level n to n+1: 100 * n.
+XP_PER_LEVEL = 100
+
+
+def _train_skill(player):
+    """One hit trains the skill matching the equipped weapon.
+
+    Returns a level-up message, or None when the skill just gains XP.
+    """
+    skills = player.get("skills")
+    if not skills:
+        return None
+    style = weapon_skill(player)
+    skill = skills.setdefault(style, {"level": 1, "xp": 0})
+    skill["xp"] += 1
+    needed = 5 * skill["level"]
+    if skill["xp"] >= needed:
+        skill["xp"] -= needed
+        skill["level"] += 1
+        return f"Your {style.capitalize()} skill rises to level {skill['level']}!"
+    return None
+
+
+def _award_xp(game, amount, message_limit):
+    """Grant XP and resolve level-ups. Returns level-up discoveries.
+
+    Each level: +2 max HP, heal 2 HP, and +1 base attack every 2nd level.
+    """
+    player = game.player
+    discoveries = []
+    if amount <= 0:
+        return discoveries
+    player["xp"] = player.get("xp", 0) + amount
+    _add_message(game, f"You gain {amount} XP.", message_limit)
+    while player["xp"] >= XP_PER_LEVEL * player.get("level", 1):
+        player["xp"] -= XP_PER_LEVEL * player["level"]
+        player["level"] += 1
+        player["max_hp"] += 2
+        player["hp"] = min(player["max_hp"], player["hp"] + 2)
+        rewards = "Max HP +2, healed 2 HP."
+        if player["level"] % 2 == 0:
+            player["base_attack"] += 1
+            rewards += " Attack +1."
+        discoveries.append(
+            (
+                "Level Up!",
+                "The Borant AI announces: "
+                f"\"Level {player['level']}, Crawler! {rewards} "
+                "The viewers love a level-up.\"",
+            )
+        )
+    return discoveries
+
+
 def _add_message(game, text, message_limit):
     """Append a non-empty message and keep only the newest log entries."""
     if not text:
@@ -108,6 +162,9 @@ def apply_action(game, action, message_limit=4):
                     attack_entity(player, target_entity),
                     message_limit,
                 )
+                skill_message = _train_skill(player)
+                if skill_message is not None:
+                    _add_message(game, skill_message, message_limit)
                 if target_entity["hp"] <= 0:
                     dead_x, dead_y = target_entity["x"], target_entity["y"]
                     game.entities.remove(target_entity)
@@ -123,7 +180,9 @@ def apply_action(game, action, message_limit=4):
                             f"The {target_entity['name']} drops a loot box!",
                             message_limit,
                         )
-                    elif random.random() < ENEMY_LOOT_DROP_CHANCE:
+                    elif target_entity.get("kind") != "training_dummy" and (
+                        random.random() < ENEMY_LOOT_DROP_CHANCE
+                    ):
                         box_kind = random.choices(
                             list(ENEMY_LOOT_DROP_WEIGHTS),
                             weights=list(ENEMY_LOOT_DROP_WEIGHTS.values()),
@@ -135,6 +194,10 @@ def apply_action(game, action, message_limit=4):
                             f"The {target_entity['name']} drops a loot box!",
                             message_limit,
                         )
+                    for discovery in _award_xp(
+                        game, target_entity.get("xp", 0), message_limit
+                    ):
+                        result.discoveries.append(discovery)
             # The stairwell is the boss's to guard: it stays blocked
             # while the boss lives, even though the tile is walkable.
             elif target_props.get("exit") and _living_boss(game) is not None:

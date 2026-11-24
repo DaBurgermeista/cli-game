@@ -23,6 +23,7 @@ def create_entity(kind, x, y):
         "hostile": template["hostile"],
         "boss": template.get("boss", False),
         "boss_tier": template.get("boss_tier"),
+        "xp": template.get("xp", 0),
         "leash": None,
         "x": x,
         "y": y,
@@ -49,6 +50,13 @@ def create_player(x, y):
         "inventory": [],
         "money": 0,
         "equipped_weapon": None,
+        "level": 1,
+        "xp": 0,
+        "skills": {
+            "unarmed": {"level": 1, "xp": 0},
+            "blades": {"level": 1, "xp": 0},
+            "spears": {"level": 1, "xp": 0},
+        },
         "x": x,
         "y": y,
     }
@@ -87,12 +95,35 @@ def spawn_random_entities(world_map, biomes, walkable_tiles, count=15):
     
     return entities
 
+# Hits needed to go from skill level n to n+1: 5 * n.
+SKILL_XP_PER_LEVEL = 5
+
+
+def weapon_skill(player):
+    """Which skill the player's current weapon trains (fists: unarmed)."""
+    weapon = player.get("equipped_weapon")
+    if weapon is not None:
+        return weapon.get("skill", "unarmed")
+    return "unarmed"
+
+
+def skill_damage_bonus(player):
+    """Extra damage from the skill matching the equipped weapon."""
+    skills = player.get("skills") or {}
+    skill = skills.get(weapon_skill(player), {})
+    return max(0, skill.get("level", 1) - 1)
+
+
 def attack_entity(attacker, target):
     damage = attacker.get("base_attack", attacker.get("attack", 1))
 
     weapon = attacker.get("equipped_weapon")
     if weapon is not None:
         damage += weapon.get("value", 0)
+
+    # A trained crawler hits harder with the style they practice.
+    if attacker.get("skills") is not None:
+        damage += skill_damage_bonus(attacker)
 
     target["hp"] = max(0, target["hp"] - damage)
 
