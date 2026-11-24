@@ -69,6 +69,11 @@ def show_inventory_panel(stdscr, title, player):
     text_width = box_width - 4
 
     window = curses.newwin(box_height, box_width, start_y, start_x)
+    # New windows default to keypad off, so arrow keys arrive as a raw
+    # escape sequence: the first getch() returns ESC (27), which is the
+    # panel's close key. Enabling keypad makes getch() return KEY_UP /
+    # KEY_DOWN instead, like stdscr does under curses.wrapper.
+    window.keypad(True)
     selected = 0
 
     while True:
