@@ -4,11 +4,21 @@ The curses loop translates keys into ``GameAction`` values. ``apply_action``
 updates the game state and reports discoveries/outcomes without drawing UI.
 """
 
+import random
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
 from entities import attack_entity, get_entity_at, update_entities
-from items import get_item_at, use_item
+from items import (
+    ENEMY_LOOT_DROP_CHANCE,
+    ENEMY_LOOT_DROP_WEIGHTS,
+    add_to_inventory,
+    create_item,
+    drop_item,
+    get_item_at,
+    open_loot_box,
+    use_item,
+)
 from tiles import FLOOR, TILE_DATA
 
 
@@ -18,6 +28,7 @@ class ActionType(Enum):
     MOVE = auto()
     PICK_UP = auto()
     USE_ITEM = auto()
+    DROP_ITEM = auto()
     WAIT = auto()
 
 
@@ -28,7 +39,7 @@ class GameAction:
     type: ActionType
     dx: int = 0  # Horizontal movement: -1 left, +1 right.
     dy: int = 0  # Vertical movement: -1 up, +1 down.
-    item_index: int | None = None  # Inventory slot for USE_ITEM.
+    item_index: int | None = None  # Inventory slot for USE_ITEM / DROP_ITEM.
 
 
 @dataclass
@@ -79,7 +90,20 @@ def apply_action(game, action, message_limit=4):
                     message_limit,
                 )
                 if target_entity["hp"] <= 0:
+                    dead_x, dead_y = target_entity["x"], target_entity["y"]
                     game.entities.remove(target_entity)
+                    if random.random() < ENEMY_LOOT_DROP_CHANCE:
+                        box_kind = random.choices(
+                            list(ENEMY_LOOT_DROP_WEIGHTS),
+                            weights=list(ENEMY_LOOT_DROP_WEIGHTS.values()),
+                            k=1,
+                        )[0]
+                        game.items.append(create_item(box_kind, dead_x, dead_y))
+                        _add_message(
+                            game,
+                            f"The {target_entity['name']} drops a loot box!",
+                            message_limit,
+                        )
             # A tile can either be ordinarily walkable or require a key.
             elif target_props["walkable"] or (
                 target_props.get("needs_key", False) and player["has_key"]
@@ -103,21 +127,51 @@ def apply_action(game, action, message_limit=4):
 
     elif action.type is ActionType.PICK_UP:
         # Pickup is explicit: standing on an item only announces it.
-        result.consumed_turn = True
         item = get_item_at(game.items, player["x"], player["y"])
         if item is None:
+            result.consumed_turn = True
             _add_message(game, "There is nothing here to pick up.", message_limit)
-        else:
+        elif add_to_inventory(player, item):
+            result.consumed_turn = True
             game.items.remove(item)
-            player["inventory"].append(item)
             _add_message(game, f"You pick up the {item['name']}.", message_limit)
+        else:
+            _add_message(
+                game,
+                "Your pack is full. Drop something first.",
+                message_limit,
+            )
 
     elif action.type is ActionType.USE_ITEM:
-        # use_item returns None when the inventory choice was cancelled/invalid.
-        message = use_item(player, action.item_index)
-        if message is not None:
+        # Loot boxes open through the action layer: opening needs the game
+        # state so rolled items can spill onto the floor when the pack is full.
+        inventory = player["inventory"]
+        if (
+            action.item_index is not None
+            and 0 <= action.item_index < len(inventory)
+            and inventory[action.item_index]["type"] == "loot_box"
+        ):
             result.consumed_turn = True
-            _add_message(game, message, message_limit)
+            messages, discovery = open_loot_box(game, player, action.item_index)
+            for message in messages:
+                _add_message(game, message, message_limit)
+            if discovery is not None:
+                result.discoveries.append(discovery)
+        else:
+            # use_item returns (message, consumed_turn); a wasted use, like
+            # drinking a potion at full health, costs no turn.
+            message, consumed = use_item(player, action.item_index)
+            if message is not None:
+                result.consumed_turn = consumed
+                _add_message(game, message, message_limit)
+
+    elif action.type is ActionType.DROP_ITEM:
+        # Dropping is pack management, not a world action: it costs no turn.
+        dropped, message = drop_item(player, action.item_index)
+        if dropped is not None:
+            dropped["x"], dropped["y"] = player["x"], player["y"]
+            game.items.append(dropped)
+        _add_message(game, message, message_limit)
 
     elif action.type is ActionType.WAIT:
         result.consumed_turn = True
