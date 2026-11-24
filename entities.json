@@ -78,6 +78,54 @@
         "spawn_weight": 6,
         "biomes": ["highlands", "ruins"]
     },
+    "floor_boss": {
+        "name": "Grum, Goblin Warlord",
+        "char": "W",
+        "color": 4,
+        "hp": 14,
+        "attack": 2,
+        "hostile": true,
+        "spawn_weight": 0,
+        "biomes": ["ruins"],
+        "boss": true,
+        "boss_tier": "floor"
+    },
+    "borough_boss": {
+        "name": "Mog, Ogre Borough Boss",
+        "char": "O",
+        "color": 4,
+        "hp": 26,
+        "attack": 3,
+        "hostile": true,
+        "spawn_weight": 0,
+        "biomes": ["ruins"],
+        "boss": true,
+        "boss_tier": "borough"
+    },
+    "district_boss": {
+        "name": "Vex, District Overlord",
+        "char": "V",
+        "color": 5,
+        "hp": 40,
+        "attack": 4,
+        "hostile": true,
+        "spawn_weight": 0,
+        "biomes": ["ruins"],
+        "boss": true,
+        "boss_tier": "district"
+    },
+    "city_boss": {
+        "name": "The City Boss",
+        "char": "C",
+        "color": 4,
+        "hp": 60,
+        "attack": 5,
+        "hostile": true,
+        "spawn_weight": 0,
+        "biomes": ["ruins"],
+        "boss": true,
+        "boss_tier": "city"
+    },
     "wisp": {
         "name": "Dungeon Wisp",
         "char": "*",

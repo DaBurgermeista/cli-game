@@ -51,6 +51,25 @@ class ActionResult:
     discoveries: list = field(default_factory=list)  # (title, text) pairs.
 
 
+# What a defeated boss guarantees on the floor, by tier.
+BOSS_LOOT = {
+    "floor": ["loot_box_silver"],
+    "borough": ["loot_box_gold"],
+    "district": ["loot_box_gold"],
+    "city": ["loot_box_gold", "loot_box_gold"],
+}
+
+
+def _living_boss(game):
+    """The floor's boss, if it is still alive on the floor."""
+    boss = getattr(game, "boss", None)
+    if boss is None or boss.get("hp", 0) <= 0:
+        return None
+    if boss not in game.entities:
+        return None
+    return boss
+
+
 def _add_message(game, text, message_limit):
     """Append a non-empty message and keep only the newest log entries."""
     if not text:
@@ -92,7 +111,19 @@ def apply_action(game, action, message_limit=4):
                 if target_entity["hp"] <= 0:
                     dead_x, dead_y = target_entity["x"], target_entity["y"]
                     game.entities.remove(target_entity)
-                    if random.random() < ENEMY_LOOT_DROP_CHANCE:
+                    if target_entity.get("boss", False):
+                        # Bosses always pay out, by tier.
+                        tier = target_entity.get("boss_tier", "floor")
+                        for box_kind in BOSS_LOOT.get(tier, ["loot_box_silver"]):
+                            game.items.append(
+                                create_item(box_kind, dead_x, dead_y)
+                            )
+                        _add_message(
+                            game,
+                            f"The {target_entity['name']} drops a loot box!",
+                            message_limit,
+                        )
+                    elif random.random() < ENEMY_LOOT_DROP_CHANCE:
                         box_kind = random.choices(
                             list(ENEMY_LOOT_DROP_WEIGHTS),
                             weights=list(ENEMY_LOOT_DROP_WEIGHTS.values()),
@@ -104,6 +135,16 @@ def apply_action(game, action, message_limit=4):
                             f"The {target_entity['name']} drops a loot box!",
                             message_limit,
                         )
+            # The stairwell is the boss's to guard: it stays blocked
+            # while the boss lives, even though the tile is walkable.
+            elif target_props.get("exit") and _living_boss(game) is not None:
+                boss = _living_boss(game)
+                _add_message(
+                    game,
+                    f"The {boss['name']} blocks the stairwell! "
+                    "Defeat it first.",
+                    message_limit,
+                )
             # A tile can either be ordinarily walkable or require a key.
             elif target_props["walkable"] or (
                 target_props.get("needs_key", False) and player["has_key"]
@@ -208,8 +249,27 @@ def apply_action(game, action, message_limit=4):
         if player["hp"] <= 0:
             result.outcome = "defeat"
 
-    if props.get("exit"):
+    if props.get("exit") and _living_boss(game) is None:
         result.outcome = "victory"
+
+    boss = _living_boss(game)
+    boss_room = getattr(game, "boss_room", None)
+    if (
+        boss is not None
+        and not getattr(game, "boss_announced", False)
+        and boss_room is not None
+        and boss_room[0] <= player["x"] < boss_room[0] + boss_room[2]
+        and boss_room[1] <= player["y"] < boss_room[1] + boss_room[3]
+    ):
+        game.boss_announced = True
+        result.discoveries.append(
+            (
+                boss["name"],
+                "The Borant AI announces: \"Crawler, you have entered "
+                f"the boss room. {boss['name']} guards the stairwell. "
+                "Defeat the boss to descend!\"",
+            )
+        )
 
     if "text" in props:
         result.discoveries.append((props["name"], props["text"]))

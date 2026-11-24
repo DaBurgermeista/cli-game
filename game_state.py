@@ -6,10 +6,25 @@ output into the shared state used by the action layer and the curses display.
 
 from dataclasses import dataclass
 
-from entities import create_player, spawn_random_entities
+from entities import create_entity, create_player, spawn_random_entities
 from items import spawn_random_items
-from tiles import TILE_DATA, get_walkable_tiles
+from tiles import FLOOR, TILE_DATA, get_walkable_tiles
 from worldgen import generate_overworld
+
+
+def boss_kind_for_floor(floor_number):
+    """Which boss guards a floor's stairwell.
+
+    Every floor has a Floor Boss. Every 3rd floor the boss is a Borough
+    Boss, every 9th a District Boss, and every 18th a City Boss.
+    """
+    if floor_number % 18 == 0:
+        return "city_boss"
+    if floor_number % 9 == 0:
+        return "district_boss"
+    if floor_number % 3 == 0:
+        return "borough_boss"
+    return "floor_boss"
 
 
 @dataclass
@@ -37,6 +52,10 @@ class GameState:
     intro_title: str
     intro_text: str
     outcome: str | None = None
+    floor_number: int = 1
+    boss_room: tuple | None = None
+    boss: dict | None = None
+    boss_announced: bool = False
 
 
 def create_game_state(
@@ -52,6 +71,8 @@ def create_game_state(
     intro_title="",
     intro_text="",
     starting_message="Explore.",
+    floor_number=1,
+    player=None,
 ):
     """Create a complete run from a generator and spawn settings.
 
@@ -61,14 +82,24 @@ def create_game_state(
     Spawn counts and descriptive text are parameters so a world profile can
     customize a run without changing the state-building code.
     """
-    grid, elevation, regions, player_x, player_y = world_generator(
+    generated = world_generator(
         width,
         height,
         seed=seed,
     )
+    # Dungeon generators add the boss room as a sixth element; the
+    # overworld returns five parts and has no boss room.
+    grid, elevation, regions, player_x, player_y = generated[:5]
+    boss_room = generated[5] if len(generated) > 5 else None
 
     start = (player_x, player_y)
-    player = create_player(*start)
+    if player is None:
+        player = create_player(*start)
+    else:
+        # Descending to a new floor: keep the crawler, reset position and
+        # the per-floor boss key, and leave HP, pack, and equipment alone.
+        player["x"], player["y"] = start
+        player["has_key"] = False
     # Don't let random content cover the start, a pickup objective, or an exit.
     reserved_tiles = {
         (x, y)
@@ -77,6 +108,14 @@ def create_game_state(
         if TILE_DATA[tile].get("exit") or TILE_DATA[tile].get("pickup")
     }
     reserved_tiles.add(start)
+    if boss_room is not None:
+        # The boss room is the boss's arena: no random mobs or loot in it.
+        boss_x, boss_y, boss_w, boss_h = boss_room
+        reserved_tiles |= {
+            (x, y)
+            for y in range(boss_y, boss_y + boss_h)
+            for x in range(boss_x, boss_x + boss_w)
+        }
     # Entities and items use the generator's region labels to choose matching
     # entries from entities.json and items.json.
     entity_tiles = get_walkable_tiles(grid, exclude=reserved_tiles)
@@ -86,6 +125,35 @@ def create_game_state(
         entity_tiles,
         count=entity_count,
     )
+    if floor_number > 1:
+        # Deeper floors hit harder: regular mobs gain HP with the floor.
+        for entity in entities:
+            if entity.get("hostile", False):
+                entity["hp"] += floor_number - 1
+
+    # The boss spawns in its room, next to the stairwell, leashed to the
+    # room so it never roams the floor.
+    boss = None
+    if boss_room is not None:
+        boss_kind = boss_kind_for_floor(floor_number)
+        boss_x, boss_y, boss_w, boss_h = boss_room
+        center_x = boss_x + boss_w // 2
+        center_y = boss_y + boss_h // 2
+        boss_spot = None
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1)):
+            candidate = (center_x + dx, center_y + dy)
+            if grid[candidate[1]][candidate[0]] == FLOOR:
+                boss_spot = candidate
+                break
+        if boss_spot is not None:
+            boss = create_entity(boss_kind, *boss_spot)
+            boss["leash"] = [
+                boss_x,
+                boss_y,
+                boss_x + boss_w - 1,
+                boss_y + boss_h - 1,
+            ]
+            entities.append(boss)
 
     # Place items after entities and exclude their occupied positions too.
     occupied_tiles = {start} | {
@@ -115,4 +183,7 @@ def create_game_state(
         location_name=location_name,
         intro_title=intro_title,
         intro_text=intro_text,
+        floor_number=floor_number,
+        boss_room=boss_room,
+        boss=boss,
     )
