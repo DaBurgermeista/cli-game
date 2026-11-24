@@ -3,6 +3,7 @@ import random
 from pathlib import Path
 
 from tiles import TILE_DATA
+from vision import has_line_of_sight
 
 DATA_FILE = Path(__file__).parent / "entities.json"
 
@@ -107,7 +108,11 @@ def update_entities(entities, room, player, aggro_range=7):
         ex, ey = entity["x"], entity["y"]
         distance = abs(px - ex) + abs(py - ey)
 
-        if entity.get("hostile", False) and distance <= aggro_range:
+        if (
+            entity.get("hostile", False)
+            and distance <= aggro_range
+            and has_line_of_sight(room, ex, ey, px, py)
+        ):
             if distance == 1:
                 turn_message.append(attack_entity(entity, player))
                 continue
