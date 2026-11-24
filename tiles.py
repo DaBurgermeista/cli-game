@@ -5,6 +5,7 @@ WALL = "wall"
 FLOOR = "floor"
 DOOR = "door"
 KEY = "key"
+LOCKED_DOOR = "locked_door"
 EXIT = "exit"
 SPIKE = "spike"
 TREE = "tree"
@@ -106,6 +107,15 @@ TILE_DATA = {
         "walkable": True,
         "blocks_sight": False,
         "enter_msg": "You step through a weathered dungeon door.",
+    },
+    LOCKED_DOOR: {
+        "char": "+",
+        "name": "Locked Vault Door",
+        "color": 3,
+        "walkable": False,
+        "blocks_sight": False,
+        "needs_key": True,
+        "bump_msg": "Locked. The vault needs a key.",
     },
     KEY: {
         "char": "K",
