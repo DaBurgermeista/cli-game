@@ -79,7 +79,21 @@ def show_inventory_panel(stdscr, title, lines):
         return key - ord("1")
     return None
 
-def render_sidebar(stdscr, player, biome_name, visible_entities, start_x, panel_width):
+def render_sidebar(
+    stdscr,
+    player,
+    area_name,
+    visible_entities,
+    start_x,
+    panel_width,
+    area_label="Area",
+):
+    """Show player details and visible entities beside the map.
+
+    ``area_name`` is the generator's current region tag (for example,
+    ``forest`` or ``ruins``); ``area_label`` lets each world profile choose
+    the UI term shown before that value.
+    """
     panel_width = 25
     stats = player.get("stats", {})
     weapon = player["equipped_weapon"]["name"] if player["equipped_weapon"] else "Fists"
@@ -88,10 +102,10 @@ def render_sidebar(stdscr, player, biome_name, visible_entities, start_x, panel_
         f"=== {player['name']} ===",
         f"HP:   {player['hp']}/{player['max_hp']}",
         f"Wpn:  {weapon}",
-        f"Key:  {'Yes' if player['has_key'] else 'No'} | $: {player['money']}",
+        f"Key:  {'Yes' if player['has_key'] else 'No'} | Gold: {player['money']}",
         "",
         "--- Location ---",
-        f"Biome: {biome_name.title()}",
+        f"{area_label}: {area_name.title()}",
         f"Pos: {player['x']}, {player["y"]}",
         "",
         "--- Attributes ---",

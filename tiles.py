@@ -19,12 +19,12 @@ MOUNTAIN = "mountain"
 HILL = "hill"
 
 SHRINE_TEXT = (
-    "The shrine is older than any stonework you have seen in the nearby "
+    "A Borant shrine, older than any stonework you have seen in the nearby "
     "ruins. Four weathered pillars surround a low altar marked with a "
     "single flowing line.\n\n"
-    "When you place a hand on the stone, the river answers somewhere in "
+    "When you place a hand on the stone, the dungeon answers somewhere in "
     "the distance.\n\n"
-    "For a moment, you are certain the forest is listening."
+    "For a moment, you are certain the AI is listening."
 )
 
 TILE_DATA = {
@@ -93,7 +93,7 @@ TILE_DATA = {
     },
     SPIKE: {
         "char": "!",
-        "name": "Spike",
+        "name": "Spike Trap",
         "color": 10,
         "walkable": True,
         "blocks_sight": False,
@@ -101,23 +101,23 @@ TILE_DATA = {
     },
     DOOR: {
         "char": "+",
-        "name": "Doorway",
+        "name": "Dungeon Door",
         "color": 3,
         "walkable": True,
         "blocks_sight": False,
-        "enter_msg": "You step through a weathered doorway.",
+        "enter_msg": "You step through a weathered dungeon door.",
     },
     KEY: {
         "char": "K",
-        "name": "Key",
+        "name": "Boss Key",
         "color": 3,
         "walkable": True,
         "blocks_sight": False,
         "pickup": "key",
     },
     EXIT: {
-        "char": "E",
-        "name": "Exit",
+        "char": ">",
+        "name": "Stairwell",
         "color": 3,
         "walkable": True,
         "blocks_sight": False,
@@ -141,27 +141,27 @@ TILE_DATA = {
     },
     SHRINE: {
         "char": "A",
-        "name": "Ancient Shrine",
+        "name": "Borant Shrine",
         "color": 5,
         "walkable": True,
         "blocks_sight": False,
         "enter_msg": (
-            "You discover an ancient shrine. "
-            "Its stone is warm to the touch."
+            "You discover a Borant shrine. "
+            "Its stone hums with dungeon energy."
         ),
         "text": SHRINE_TEXT,
     },
     CAMPFIRE: {
         "char": "*",
-        "name": "Abandoned Camp",
+        "name": "Safe Room",
         "color": 4,
         "walkable": True,
         "blocks_sight": False,
-        "enter_msg": "You find the remains of an abandoned camp.",
+        "enter_msg": "You find a safe room. The AI marks it as a rest area.",
         "text": (
             "A ring of stones surrounds a cold fire pit. The ash has not "
             "yet scattered, but the bedrolls and supplies are gone.\n\n"
-            "Whoever camped here left in a hurry."
+            "Whoever camped here left in a hurry, or the dungeon took them."
         ),
     },
 }

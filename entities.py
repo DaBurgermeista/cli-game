@@ -28,7 +28,7 @@ def create_entity(kind, x, y):
 def create_player(x, y):
     return {
         "kind": "player",
-        "name": "Adventurer",
+        "name": "Carl",
         "char": "@",
         "color": 1,
         "hp": 5,

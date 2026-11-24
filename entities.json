@@ -1,23 +1,23 @@
 {
     "wolf": {
-        "name": "Timber Wolf",
-        "char": "w",
+        "name": "Goblin",
+        "char": "g",
         "color": 4,
         "hp": 3,
         "attack": 1,
         "hostile": true,
         "spawn_weight": 5,
-        "biomes": ["forest", "highlands"]
+        "biomes": ["forest", "highlands", "ruins"]
     },
     "deer": {
-        "name": "Forest Deer",
-        "char": "d",
+        "name": "Dungeon Rat",
+        "char": "r",
         "color": 3,
         "hp": 2,
         "attack": 1,
         "hostile": false,
         "spawn_weight": 8,
-        "biomes": ["forest", "plains", "meadow"]
+        "biomes": ["forest", "plains", "meadow", "ruins"]
     },
     "troll": {
         "name": "Cave Troll",
@@ -29,28 +29,28 @@
         "biomes": ["ruins", "highlands"]
     },
     "beaver": {
-        "name": "Woodland Beaver",
-        "char": "b",
+        "name": "Sewer Lurker",
+        "char": "l",
         "color": 3,
         "hp": 1,
         "attack": 1,
         "hostile": false,
         "spawn_weight": 3,
-        "biomes": ["riverbank", "water"]
+        "biomes": ["riverbank", "water", "ruins"]
     },
     "boar": {
-        "name": "Wild Boar",
+        "name": "Spiked Boar",
         "char": "B",
         "color": 3,
         "hp": 4,
         "attack": 1,
         "hostile": true,
         "spawn_weight": 4,
-        "biomes": ["forest", "meadow"]
+        "biomes": ["forest", "meadow", "ruins"]
     },
     "bandit": {
-        "name": "Scavenger",
-        "char": "s",
+        "name": "Dungeon Looter",
+        "char": "L",
         "color": 4,
         "hp": 4,
         "attack": 1,
@@ -59,33 +59,33 @@
         "biomes": ["camp", "ruins", "plains"]
     },
     "snake": {
-        "name": "River Viper",
+        "name": "Cave Viper",
         "char": "v",
         "color": 2,
         "hp": 2,
         "attack": 1,
         "hostile": true,
         "spawn_weight": 4,
-        "biomes": ["riverbank", "water", "meadow"]
+        "biomes": ["riverbank", "water", "meadow", "ruins"]
     },
     "goat": {
-        "name": "Crag Goat",
-        "char": "g",
+        "name": "Cave Goat",
+        "char": "G",
         "color": 3,
         "hp": 2,
         "attack": 1,
         "hostile": false,
         "spawn_weight": 6,
-        "biomes": ["highlands"]
+        "biomes": ["highlands", "ruins"]
     },
     "wisp": {
-        "name": "Forest Wisp",
+        "name": "Dungeon Wisp",
         "char": "*",
         "color": 5,
         "hp": 2,
         "attack": 1,
         "hostile": false,
         "spawn_weight": 2,
-        "biomes": ["shrine", "forest"]
+        "biomes": ["shrine", "forest", "ruins"]
     }
 }

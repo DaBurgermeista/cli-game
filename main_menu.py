@@ -1,15 +1,23 @@
+"""Curses main menu; playable world choices come from world profiles."""
+
 import curses
 
+from world_profiles import WORLD_PROFILES
 
+# Game modes are derived from profiles so adding a world does not require
+# duplicating its name and description in the menu.
 MENU_ITEMS = [
-    ("New Game", "Begin a new journey into the wilderness."),
+    (profile.menu_label, profile.description)
+    for profile in WORLD_PROFILES.values()
+] + [
     ("Options", "Configure display and gameplay settings."),
     ("Credits", "View game and project credits."),
-    ("Quit", "Exit The Quiet River."),
+    ("Quit", "Exit the dungeon."),
 ]
 
 
 def center_text(window, y, text, attr=curses.A_NORMAL):
+    """Draw one line centered horizontally, clipped to the window width."""
     max_y, max_x = window.getmaxyx()
 
     if not (0 <= y < max_y):
@@ -35,6 +43,7 @@ def print_menu_items(
     spacing=1,
     is_main_menu=True,
 ):
+    """Draw selectable labels and return their screen rows."""
     item_rows = []
     max_y, max_x = window.getmaxyx()
 
@@ -70,14 +79,16 @@ def print_menu_items(
 
 
 def show_main_menu(stdscr):
+    """Display the menu until a mode, utility page, or quit is selected."""
     selected_index = 0
 
     while True:
         max_y, max_x = stdscr.getmaxyx()
         stdscr.erase()
 
-        # Keep the menu usable in a small terminal.
-        if max_y < 16 or max_x < 40:
+        # The menu uses five rows plus a description and footer; avoid drawing
+        # into overlapping rows when the terminal is shorter than that layout.
+        if max_y < 20 or max_x < 40:
             center_text(
                 stdscr,
                 max_y // 2,
@@ -88,8 +99,8 @@ def show_main_menu(stdscr):
             stdscr.getch()
             continue
 
-        title = "THE QUIET RIVER"
-        subtitle = "A wilderness crawler"
+        title = "DUNGEON CRAWLER CARL"
+        subtitle = "A Borant dungeon crawl"
 
         center_text(
             stdscr,
@@ -109,7 +120,7 @@ def show_main_menu(stdscr):
         labels = [label for label, _ in MENU_ITEMS]
 
         menu_x = max(2, (max_x - 28) // 2)
-        menu_y = 8
+        menu_y = 6
 
         print_menu_items(
             stdscr,

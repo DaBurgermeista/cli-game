@@ -1,22 +1,15 @@
+"""Curses front end for selecting a world and playing a turn-based run."""
+
 import curses
 
-from entities import (
-    create_player,
-    get_entity_at,
-    spawn_random_entities,
-    attack_entity,
-    update_entities,
-)
-from items import spawn_random_items, get_item_at, format_inventory, use_item
+from items import format_inventory
 from render import draw_map, init_colors, draw_message_log
-from tiles import FLOOR, TILE_DATA, get_walkable_tiles
-from worldgen import generate_overworld
 from vision import get_visible_tiles
 from ui import show_text_panel, show_inventory_panel, render_sidebar
 from main_menu import show_main_menu
-
-WORLD_WIDTH = 100
-WORLD_HEIGHT = 60
+from game_state import create_game_state
+from game_actions import ActionType, GameAction, apply_action
+from world_profiles import WORLD_PROFILES
 
 MAP_TOP = 2
 MESSAGE_LOG_HEIGHT = 5
@@ -25,17 +18,8 @@ SIDEBAR_WIDTH = 30
 MIN_MAP_WIDTH = 20
 MIN_MAP_HEIGHT = 10
 
-INTRO_TITLE = "The Quiet River"
-INTRO_TEXT = (
-    "You have entered a wilderness few travelers cross willingly.\n\n"
-    "Somewhere beyond these woods, the Quiet River has changed its course. "
-    "Settlements on its banks speak of unfamiliar ruins, abandoned camps, "
-    "and old shrines standing where no shrine should be.\n\n"
-    "You came to see what the land is becoming."
-)
-
-
 def add_message(messages, text):
+    """Add a UI-only message and keep the same short history as the game log."""
     if not text:
         return
 
@@ -44,12 +28,8 @@ def add_message(messages, text):
         messages.pop(0)
 
 
-def can_enter(tile_char, has_key):
-    props = TILE_DATA[tile_char]
-    return props["walkable"] or (props.get("needs_key", False) and has_key)
-
-
 def get_camera(player_x, player_y, map_width, map_height, view_width, view_height):
+    """Center the viewport on the player, clamped to the map edges."""
     camera_x = player_x - (view_width // 2)
     camera_y = player_y - (view_height // 2)
 
@@ -63,6 +43,7 @@ def get_camera(player_x, player_y, map_width, map_height, view_width, view_heigh
 
 
 def all_map_tiles(room):
+    """Return every coordinate, used by the map-reveal debug modes."""
     return {
         (x, y)
         for y in range(len(room))
@@ -71,6 +52,7 @@ def all_map_tiles(room):
 
 
 def main(stdscr):
+    """Run the menu, initialize the selected world, and handle screen input."""
     curses.curs_set(0)
     init_colors()
 
@@ -100,36 +82,37 @@ def main(stdscr):
             )
             continue
         
-        if menu_choice == "New Game":
+        # World modes are data-driven; options and credits stay in this menu.
+        if menu_choice in WORLD_PROFILES:
             break
 
-    # Begins world generation
-    room, elevation, biomes, player_x, player_y = generate_overworld(
-        WORLD_WIDTH,
-        WORLD_HEIGHT,
+    # The profile chooses map generation and flavor text; the state factory
+    # handles shared player/entity/item setup for every mode.
+    profile = WORLD_PROFILES[menu_choice]
+    game = create_game_state(
+        profile.width,
+        profile.height,
+        world_generator=profile.generator,
+        area_label=profile.area_label,
+        location_name=profile.title,
+        intro_title=profile.title,
+        intro_text=profile.intro,
+        starting_message=profile.starting_message,
     )
+    # Local aliases make the rendering calls easier to read. Mutable values
+    # still refer to the same objects held by GameState.
+    room = game.grid
+    elevation = game.elevation
+    biomes = game.regions
+    player = game.player
+    entities = game.entities
+    items = game.items
+    explored_tiles = game.explored
+    messages = game.messages
 
-    explored_tiles = [
-        [False for _ in range(WORLD_WIDTH)]
-        for _ in range(WORLD_HEIGHT)
-    ]
-
-    walkable_tiles = get_walkable_tiles(room, exclude={(player_x, player_y)})
-    entities = spawn_random_entities(room, biomes, walkable_tiles, count=15)
-
-    occupied_by_entities = {(player_x, player_y)} | {
-        (entity["x"], entity["y"]) for entity in entities
-    }
-    item_tiles = get_walkable_tiles(room, exclude=occupied_by_entities)
-    items = spawn_random_items(room, biomes, item_tiles, count=12)
-
-    player = create_player(player_x, player_y)
-    messages = ["Explore the wilderness."]
-
-    show_text_panel(stdscr, INTRO_TITLE, INTRO_TEXT)
+    show_text_panel(stdscr, game.intro_title, game.intro_text)
 
     while True:
-        took_turn = False
         max_y, max_x = stdscr.getmaxyx()
 
         if (
@@ -147,8 +130,8 @@ def main(stdscr):
         sidebar_x = view_width
 
         camera_x, camera_y = get_camera(
-            player_x,
-            player_y,
+            player["x"],
+            player["y"],
             len(room[0]),
             len(room),
             view_width,
@@ -157,10 +140,11 @@ def main(stdscr):
 
         stdscr.erase()
 
+        # Fog-of-war visibility is recalculated from the current player tile.
         natural_visible_tiles = get_visible_tiles(
             room,
-            player_x,
-            player_y,
+            player["x"],
+            player["y"],
             radius=8,
         )
 
@@ -180,10 +164,11 @@ def main(stdscr):
         ]
 
         hud = (
+            f"{game.location_name} | "
             f"Health: {player['hp']}/{player['max_hp']} | "
             f"Key: {'Yes' if player['has_key'] else 'No'} | "
-            f"Pos: {player_x}, {player_y} | "
-            f"Biome: {biomes[player_y][player_x].title()}"
+            f"Pos: {player['x']}, {player['y']} | "
+            f"{game.area_label}: {biomes[player['y']][player['x']].title()}"
         )
         if debug_elevation:
             hud += " | Elevation: On"
@@ -192,8 +177,8 @@ def main(stdscr):
         draw_map(
             stdscr,
             room,
-            player_x,
-            player_y,
+            player["x"],
+            player["y"],
             entities,
             items,
             camera_x,
@@ -222,6 +207,7 @@ def main(stdscr):
             visible_entities,
             start_x=sidebar_x,
             panel_width=SIDEBAR_WIDTH,
+            area_label=game.area_label,
         )
 
         stdscr.refresh()
@@ -230,6 +216,7 @@ def main(stdscr):
         if key == ord("q"):
             break
 
+        # These keys only change the display, so they do not advance a turn.
         if key == ord("f"):
             debug_reveal_map = not debug_reveal_map
             add_message(
@@ -250,6 +237,8 @@ def main(stdscr):
             )
             continue
 
+        # Inventory browsing is UI work. Only a selected item becomes an
+        # action; cancelling the panel leaves the world untouched.
         if key == ord("i"):
             if not player["inventory"]:
                 show_text_panel(stdscr, "Inventory", "Your pack is empty.")
@@ -259,114 +248,44 @@ def main(stdscr):
                     "Inventory",
                     format_inventory(player),
                 )
-                message = use_item(player, choice)
-                if message:
-                    add_message(messages, message)
-                    # Using an item consumes a turn; browsing or cancelling does not.
-                    took_turn = True
-            if not took_turn:
+                if choice is None:
+                    continue
+                action = GameAction(ActionType.USE_ITEM, item_index=choice)
+            if not player["inventory"]:
                 continue
-
-        next_x, next_y = player_x, player_y
-
-        if key == ord("g"):
-            item = get_item_at(items, player_x, player_y)
-            if item is None:
-                add_message(messages, "There is nothing here to pick up.")
-            else:
-                items.remove(item)
-                player["inventory"].append(item)
-                add_message(messages, f"You pick up the {item['name']}.")
-            took_turn = True
-
+        # Convert terminal keys into game-level actions. The rules module
+        # handles movement, combat, pickup, effects, and enemy turns.
         elif key in (ord("w"), curses.KEY_UP):
-            next_y -= 1
-            took_turn = True
+            action = GameAction(ActionType.MOVE, dy=-1)
         elif key in (ord("s"), curses.KEY_DOWN):
-            next_y += 1
-            took_turn = True
+            action = GameAction(ActionType.MOVE, dy=1)
         elif key in (ord("a"), curses.KEY_LEFT):
-            next_x -= 1
-            took_turn = True
+            action = GameAction(ActionType.MOVE, dx=-1)
         elif key in (ord("d"), curses.KEY_RIGHT):
-            next_x += 1
-            took_turn = True
-        elif key != ord("i"):
+            action = GameAction(ActionType.MOVE, dx=1)
+        elif key == ord("g"):
+            action = GameAction(ActionType.PICK_UP)
+        elif key == ord("."):
+            action = GameAction(ActionType.WAIT)
+        else:
             # Ignore unrecognized input without advancing the game state.
             continue
 
-        if (next_x, next_y) != (player_x, player_y):
-            if not (0 <= next_y < len(room) and 0 <= next_x < len(room[0])):
-                # Attempted movement consumes a turn, just like bumping a wall.
-                add_message(messages, "You cannot go that way.")
-            else:
-                target_tile = room[next_y][next_x]
-                target_props = TILE_DATA[target_tile]
-                target_entity = get_entity_at(entities, next_x, next_y)
+        result = apply_action(game, action, message_limit=MAX_MESSAGES)
+        # The action layer reports semantic discoveries/outcomes; curses is
+        # responsible only for presenting the corresponding panels.
+        for title, text in result.discoveries:
+            show_text_panel(stdscr, title, text)
 
-                if target_entity is not None:
-                    add_message(messages, attack_entity(player, target_entity))
-                    if target_entity["hp"] <= 0:
-                        entities.remove(target_entity)
-
-                elif can_enter(target_tile, player["has_key"]):
-                    player_x, player_y = next_x, next_y
-                    player["x"], player["y"] = player_x, player_y
-
-                    if target_props.get("needs_key"):
-                        room[player_y][player_x] = FLOOR
-                        add_message(messages, "You unlocked the door!")
-                    else:
-                        add_message(messages, target_props.get("enter_msg", ""))
-
-                else:
-                    add_message(
-                        messages,
-                        target_props.get("bump_msg", "Something blocks your way."),
-                    )
-
-        if not took_turn:
-            continue
-
-        current_tile = room[player_y][player_x]
-        props = TILE_DATA[current_tile]
-        ground_item = get_item_at(items, player_x, player_y)
-
-        if ground_item is not None:
-            add_message(messages, f"You see a {ground_item['name']} here.")
-
-        if props.get("pickup") == "key":
-            add_message(messages, "You found a key.")
-            player["has_key"] = True
-            room[player_y][player_x] = FLOOR
-            props = TILE_DATA[FLOOR]
-
-        if "damage" in props:
-            player["hp"] = max(0, player["hp"] - props["damage"])
-            add_message(
-                messages,
-                f"Ouch! You took {props['damage']} damage from {props['name']}!",
-            )
-            if player["hp"] <= 0:
-                show_text_panel(stdscr, "Defeated!", "You died.")
-                break
-
-        if props.get("exit"):
+        if result.outcome == "defeat":
+            show_text_panel(stdscr, "Defeated!", "You died. The dungeon claims another crawler.")
+            break
+        if result.outcome == "victory":
             show_text_panel(
                 stdscr,
                 "Victory!",
-                "Good job! You found the exit!\n",
+                "Floor cleared! You found the stairwell!\n",
             )
-            break
-
-        if "text" in props:
-            show_text_panel(stdscr, props["name"], props["text"])
-
-        for message in update_entities(entities, room, player):
-            add_message(messages, message)
-
-        if player["hp"] <= 0:
-            show_text_panel(stdscr, "Defeated!", "You died.")
             break
 
 
