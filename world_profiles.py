@@ -46,19 +46,21 @@ WORLD_PROFILES = {
         area_label="Biome",
         starting_message="Explore the wilderness.",
     ),
-    "Dungeon Run": WorldProfile(
-        menu_label="Dungeon Run",
-        description="Explore connected rooms, corridors, and hazards.",
+    "Floor 1": WorldProfile(
+        menu_label="Floor 1",
+        description="Descend into the dungeon. Find the stairwell.",
         width=64,
         height=36,
         generator=generate_dungeon,
-        title="Dungeon Floor 1",
+        title="Floor 1",
         intro=(
-            "The stone passage narrows behind you. Ahead, old rooms and "
-            "dark corridors descend into the dungeon. Find the exit and "
-            "watch for creatures in the ruins."
+            "Welcome, Crawler. The Borant Corporation thanks you for "
+            "your participation.\n\n"
+            "Ahead, old rooms and dark corridors descend into the "
+            "dungeon. Find the stairwell and watch for creatures in "
+            "the ruins. Loot boxes are waiting. Probably."
         ),
         area_label="Area",
-        starting_message="You enter the dungeon.",
+        starting_message="You enter Floor 1. Good luck, Crawler.",
     ),
 }

@@ -1,24 +1,24 @@
 {
     "healing_herb": {
-        "name": "Sunleaf Herb",
-        "char": "%",
+        "name": "Health Potion",
+        "char": "!",
         "color": 2,
         "type": "heal",
         "value": 1,
         "spawn_weight": 8,
-        "biomes": ["meadow", "forest"]
+        "biomes": ["meadow", "forest", "ruins"]
     },
     "ration": {
-        "name": "Travel Ration",
+        "name": "Crawler Ration",
         "char": "%",
         "color": 3,
         "type": "heal",
         "value": 2,
         "spawn_weight": 5,
-        "biomes": ["camp", "plains"]
+        "biomes": ["camp", "plains", "ruins"]
     },
     "rusted_knife": {
-        "name": "Rusted Knife",
+        "name": "Rusty Dagger",
         "char": "/",
         "color": 3,
         "type": "weapon",
@@ -27,7 +27,7 @@
         "biomes": ["camp", "ruins"]
     },
     "iron_spear": {
-        "name": "Iron Spear",
+        "name": "Borant Spear",
         "char": "/",
         "color": 5,
         "type": "weapon",
@@ -36,12 +36,12 @@
         "biomes": ["ruins"]
     },
     "shrine_charm": {
-        "name": "Warding Charm",
+        "name": "Lucky Charm",
         "char": "*",
         "color": 5,
         "type": "heal",
         "value": 3,
         "spawn_weight": 2,
-        "biomes": ["shrine"]
+        "biomes": ["shrine", "ruins"]
     }
 }

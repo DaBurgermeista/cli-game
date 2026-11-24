@@ -102,7 +102,7 @@ def render_sidebar(
         f"=== {player['name']} ===",
         f"HP:   {player['hp']}/{player['max_hp']}",
         f"Wpn:  {weapon}",
-        f"Key:  {'Yes' if player['has_key'] else 'No'} | $: {player['money']}",
+        f"Key:  {'Yes' if player['has_key'] else 'No'} | Gold: {player['money']}",
         "",
         "--- Location ---",
         f"{area_label}: {area_name.title()}",

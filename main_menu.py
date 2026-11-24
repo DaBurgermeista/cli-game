@@ -12,7 +12,7 @@ MENU_ITEMS = [
 ] + [
     ("Options", "Configure display and gameplay settings."),
     ("Credits", "View game and project credits."),
-    ("Quit", "Exit The Quiet River."),
+    ("Quit", "Exit the dungeon."),
 ]
 
 
@@ -99,8 +99,8 @@ def show_main_menu(stdscr):
             stdscr.getch()
             continue
 
-        title = "THE QUIET RIVER"
-        subtitle = "A procedural adventure crawler"
+        title = "DUNGEON CRAWLER CARL"
+        subtitle = "A Borant dungeon crawl"
 
         center_text(
             stdscr,

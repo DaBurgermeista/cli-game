@@ -278,13 +278,13 @@ def main(stdscr):
             show_text_panel(stdscr, title, text)
 
         if result.outcome == "defeat":
-            show_text_panel(stdscr, "Defeated!", "You died.")
+            show_text_panel(stdscr, "Defeated!", "You died. The dungeon claims another crawler.")
             break
         if result.outcome == "victory":
             show_text_panel(
                 stdscr,
                 "Victory!",
-                "Good job! You found the exit!\n",
+                "Floor cleared! You found the stairwell!\n",
             )
             break
 

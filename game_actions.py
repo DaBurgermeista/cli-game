@@ -87,7 +87,7 @@ def apply_action(game, action, message_limit=4):
                 player["x"], player["y"] = next_x, next_y
                 if target_props.get("needs_key"):
                     game.grid[next_y][next_x] = FLOOR
-                    _add_message(game, "You unlocked the door!", message_limit)
+                    _add_message(game, "You unlocked the dungeon door!", message_limit)
                 else:
                     _add_message(
                         game,
@@ -139,7 +139,7 @@ def apply_action(game, action, message_limit=4):
         _add_message(game, f"You see a {ground_item['name']} here.", message_limit)
 
     if props.get("pickup") == "key":
-        _add_message(game, "You found a key.", message_limit)
+        _add_message(game, "You found a boss key.", message_limit)
         player["has_key"] = True
         game.grid[player["y"]][player["x"]] = FLOOR
         props = TILE_DATA[FLOOR]

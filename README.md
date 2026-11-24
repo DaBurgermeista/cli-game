@@ -1,6 +1,6 @@
-# CLI Game
+# Dungeon Crawler Carl Game
 
-Early Python/curses exploration-game prototype.
+Early Python/curses exploration-game prototype, themed on Dungeon Crawler Carl.
 
 ## Controls
 
@@ -12,7 +12,7 @@ Early Python/curses exploration-game prototype.
 - `E`: toggle elevation debug view
 - `Q`: quit
 
-The main menu offers both the original overworld and a generated dungeon run.
+The main menu offers both the original overworld and Floor 1, a generated dungeon run. You play as Carl, a crawler in the Borant dungeon.
 
 ## Current features
 
@@ -20,7 +20,7 @@ The main menu offers both the original overworld and a generated dungeon run.
 - Rivers, lakes, bridges, forests, and buildings
 - Scrolling camera
 - Field of view and explored-map memory
-- Keys, exits, hazards, and turn-based entity movement
+- Boss keys, stairwells, spike traps, and turn-based entity movement
 - Connected-room dungeon generation
 - A game-state/action layer separate from curses input
 
@@ -44,7 +44,7 @@ Early development prototype. Gameplay systems and objectives are still in progre
 ## v0.2.0
 
 - Added tall-grass terrain patches
-- Added ancient shrine and abandoned-camp landmarks
+- Added Borant shrine and safe-room landmarks
 - Added reusable modal text panels for discoveries and future dialogue
 - Added a persistent message log
 - Improved map variety and exploration feedback
