@@ -42,7 +42,9 @@ def generate_dungeon(width, height, seed=None):
     """Generate connected dungeon rooms and corridors.
 
     Returns the same grid, elevation, region, and starting-coordinate tuple
-    as the overworld generator, so it can be used by ``create_game_state``.
+    as the overworld generator, plus the boss room ``(x, y, width, height)``
+    as a sixth element. The boss room is the largest room that is not the
+    start room; the stairwell sits inside it, and the boss guards it.
     """
     if width < 24 or height < 16:
         raise ValueError("Dungeon maps must be at least 24x16.")
@@ -92,17 +94,31 @@ def generate_dungeon(width, height, seed=None):
         rooms.extend((first, last))
         _carve_corridor(grid, centers[0], centers[1], rng)
 
+    # The boss room is the largest room that is not the start room, so the
+    # boss always has a real arena and the start stays safe. The stairwell
+    # sits at its center: reaching the exit means going through the boss.
+    start_room = rooms[0]
+    boss_room = max(
+        (room for room in rooms if room != start_room),
+        key=lambda room: room[2] * room[3],
+    )
+    boss_center_x = boss_room[0] + boss_room[2] // 2
+    boss_center_y = boss_room[1] + boss_room[3] // 2
+
     # Hazards are placed in room interiors. Even where a corridor crosses a
     # room, spikes remain walkable, so they add risk without cutting off the exit.
     for x, y, room_width, room_height in rooms:
         for room_y in range(y + 1, y + room_height - 1):
             for room_x in range(x + 1, x + room_width - 1):
-                is_start_or_exit = (room_x, room_y) in (centers[0], centers[-1])
+                is_start_or_exit = (room_x, room_y) in (
+                    centers[0],
+                    (boss_center_x, boss_center_y),
+                )
                 if not is_start_or_exit and rng.random() < 0.025:
                     grid[room_y][room_x] = SPIKE
 
     start_x, start_y = centers[0]
-    exit_x, exit_y = centers[-1]
+    exit_x, exit_y = boss_center_x, boss_center_y
     grid[exit_y][exit_x] = EXIT
 
     # The existing ruin creature and loot tables use the "ruins" region tag.
@@ -112,5 +128,6 @@ def generate_dungeon(width, height, seed=None):
         for _ in range(height)
     ]
     elevation = [[0.0 for _ in range(width)] for _ in range(height)]
-    # Keep the same five-part interface as the overworld generator.
-    return grid, elevation, regions, start_x, start_y
+    # The boss room rides along as a sixth element; create_game_state
+    # handles generators that return five parts (like the overworld) too.
+    return grid, elevation, regions, start_x, start_y, boss_room
